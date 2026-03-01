@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Mechanika - Nyitott szelvény</title>
+    <title>Mechanika - Összesített Kalkulátor</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -18,52 +18,84 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika válogatott fejezetei</h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Vékonyfalú nyitott szelvény – Dinamikus összeállítás</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Prizmatikus rudak ellenőrzése</p>
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-5 space-y-4">
-            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-4">
-                <div class="flex items-center justify-between bg-slate-900/50 p-3 rounded-xl border border-indigo-500/20">
-                    <label class="text-sm font-bold text-indigo-300 uppercase tracking-tighter">Hány elemből áll?</label>
-                    <input type="number" id="n_elem" min="1" max="10" value="3" 
-                           class="w-16 p-2 bg-indigo-900/30 border border-indigo-500 rounded-lg text-center font-black text-white outline-none"
-                           oninput="generateInputs()">
-                </div>
-
-                <div id="element-rows" class="space-y-3">
-                    </div>
-
-                <div class="pt-4 flex items-center justify-between border-t border-slate-700">
-                    <div class="flex flex-col">
-                        <label class="text-xs math text-indigo-400">&eta; (helyesbítő tényező)</label>
-                        <span class="text-[9px] text-slate-500 uppercase font-bold">csomóponti korrekció</span>
-                    </div>
-                    <input type="number" id="eta_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center font-bold" value="1.15" step="0.01" oninput="calculate()">
-                </div>
+        <div class="lg:col-span-5 space-y-6">
+            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Szelvény típusa</label>
+                <select id="type" onchange="updateUI()" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-indigo-400 outline-none">
+                    <option value="kor">Kör szelvény</option>
+                    <option value="gyuru">Körgyűrű szelvény</option>
+                    <option value="teglalap">Téglalap (Saint-Venant)</option>
+                    <option value="nyitott">Vékonyfalú nyitott (Dinamikus)</option>
+                    <option value="zart">Vékonyfalú zárt (Bredt)</option>
+                </select>
             </div>
 
-            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-3">
-                <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub> [Nm]:</label>
-                    <input type="number" id="Mt" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="250" oninput="calculate()">
+            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-4">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai adatok</h3>
+                
+                <div id="div-D" class="flex items-center justify-between hidden"><label class="text-sm math">D [mm]:</label>
+                    <input type="number" id="D" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()">
                 </div>
-                <div class="flex items-center justify-between"><label class="text-sm math">l (rúd hossza) [mm]:</label>
-                    <input type="number" id="L" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
+                <div id="div-d" class="flex items-center justify-between hidden"><label class="text-sm math">d [mm]:</label>
+                    <input type="number" id="d" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
                 </div>
-                <div class="flex items-center justify-between"><label class="text-sm math">G [MPa]:</label>
-                    <input type="number" id="G_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()">
+
+                <div id="div-rect" class="hidden space-y-3">
+                    <div class="flex items-center justify-between"><label class="text-sm math">b (hosszabb oldal) [mm]:</label>
+                        <input type="number" id="rect_b" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
+                    </div>
+                    <div class="flex items-center justify-between"><label class="text-sm math">a (rövidebb oldal) [mm]:</label>
+                        <input type="number" id="rect_a" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div id="div-nyitott" class="hidden space-y-4">
+                    <div class="flex items-center justify-between bg-slate-900/50 p-2 rounded-lg border border-indigo-500/20">
+                        <label class="text-xs font-bold text-indigo-300">Elemek száma:</label>
+                        <input type="number" id="n_elem" min="1" max="10" value="3" class="w-12 bg-transparent text-center font-bold" oninput="generateOpenInputs()">
+                    </div>
+                    <div id="open-element-rows" class="space-y-2"></div>
+                    <div class="flex items-center justify-between pt-2"><label class="text-xs math text-indigo-400">&eta; (helyesbítő):</label>
+                        <input type="number" id="eta_val" class="w-16 p-1 bg-slate-900 border border-slate-700 rounded text-center" value="1.15" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div id="div-zart" class="hidden space-y-3">
+                    <div class="flex items-center justify-between"><label class="text-sm math">A<sub>k</sub> [mm²]:</label>
+                        <input type="number" id="Ak_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()">
+                    </div>
+                    <div class="flex items-center justify-between"><label class="text-sm math">t (falvastagság) [mm]:</label>
+                        <input type="number" id="zart_t" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 space-y-3">
+                    <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Terhelés és Anyag</h3>
+                    <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub> [Nm]:</label>
+                        <input type="number" id="Mt" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="250" oninput="calculate()">
+                    </div>
+                    <div class="flex items-center justify-between"><label class="text-sm math">l [mm]:</label>
+                        <input type="number" id="L" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
+                    </div>
+                    <div class="flex items-center justify-between"><label class="text-sm math">G [MPa]:</label>
+                        <input type="number" id="G_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()">
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="lg:col-span-7 space-y-6">
-            <div id="warning-box" class="hidden bg-red-900/20 border border-red-500/50 p-4 rounded-2xl flex items-center gap-3 animate-pulse">
-                <span class="text-2xl">⚠️</span>
-                <p class="text-xs text-red-300 font-bold uppercase">Figyelem: A vékonyfalú feltétel (b/t ≥ 5) nem teljesül minden elemnél!</p>
+            <div id="warning-box" class="hidden bg-red-900/20 border border-red-500/50 p-4 rounded-2xl flex items-center gap-3">
+                <span class="text-xl">⚠️</span>
+                <p class="text-[10px] text-red-300 font-bold uppercase">Figyelem: b/t < 5 feltétel nem teljesül!</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-indigo-600 p-6 rounded-3xl shadow-2xl col-span-2">
+                <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl col-span-2">
                     <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (&tau;<sub>max</sub>)</span>
                     <div class="flex items-baseline gap-2">
                         <h2 id="outTau" class="text-6xl font-900 tracking-tighter text-white">0.00</h2>
@@ -73,95 +105,126 @@
 
                 <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
                     <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Torziós inercia (I<sub>t</sub>)</span>
-                    <div id="outIt" class="text-3xl font-black text-white tracking-tighter">0</div>
-                    <span class="text-[9px] text-slate-500 uppercase">mm⁴</span>
+                    <div id="outIt" class="text-3xl font-black text-white">0</div>
+                    <span class="text-[9px] text-slate-500 uppercase tracking-widest">mm⁴</span>
                 </div>
 
-                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
+                <div class="bg-slate-800 p-5 rounded-2xl border-l-4 border-indigo-500 shadow-xl">
                     <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Teljes elcsavarodás (&phi;)</span>
                     <div id="outPhi" class="text-3xl font-black text-indigo-400">0.0000 °</div>
                     <p class="text-[8px] text-slate-500 mt-1 italic">A megadott l hosszon</p>
                 </div>
             </div>
-            
-            <canvas id="canvas" width="400" height="150" class="w-full h-auto opacity-50"></canvas>
         </div>
     </div>
 </div>
 
 <script>
-function generateInputs() {
-    const n = Math.min(Math.max(parseInt(document.getElementById('n_elem').value) || 1, 1), 10);
-    const container = document.getElementById('element-rows');
-    container.innerHTML = `
-        <div class="flex text-[10px] font-black text-slate-500 uppercase px-2">
-            <div class="w-12">#</div>
-            <div class="flex-1 text-center">b [mm]</div>
-            <div class="flex-1 text-center">t [mm]</div>
-        </div>
-    `;
+// Saint-Venant táblázat téglalaphoz
+const SV_TABLE = [
+    {r: 1.0, a: 0.208, b: 0.141}, {r: 1.5, a: 0.231, b: 0.196},
+    {r: 2.0, a: 0.246, b: 0.229}, {r: 3.0, a: 0.267, b: 0.263},
+    {r: 4.0, a: 0.282, b: 0.281}, {r: 6.0, a: 0.299, b: 0.299},
+    {r: 8.0, a: 0.307, b: 0.307}, {r: 10.0, a: 0.312, b: 0.312},
+    {r: 100.0, a: 0.333, b: 0.333}
+];
 
+function interpolate(ratio, key) {
+    if (ratio <= SV_TABLE[0].r) return SV_TABLE[0][key];
+    if (ratio >= SV_TABLE[SV_TABLE.length-1].r) return SV_TABLE[SV_TABLE.length-1][key];
+    for (let i = 0; i < SV_TABLE.length - 1; i++) {
+        const p1 = SV_TABLE[i], p2 = SV_TABLE[i+1];
+        if (ratio >= p1.r && ratio <= p2.r) {
+            return p1[key] + (ratio - p1.r) / (p2.r - p1.r) * (p2[key] - p1[key]);
+        }
+    }
+}
+
+function updateUI() {
+    const type = document.getElementById('type').value;
+    ['div-D', 'div-d', 'div-rect', 'div-nyitott', 'div-zart'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    
+    if(type === 'kor') document.getElementById('div-D').classList.remove('hidden');
+    if(type === 'gyuru') { document.getElementById('div-D').classList.remove('hidden'); document.getElementById('div-d').classList.remove('hidden'); }
+    if(type === 'teglalap') document.getElementById('div-rect').classList.remove('hidden');
+    if(type === 'nyitott') { document.getElementById('div-nyitott').classList.remove('hidden'); generateOpenInputs(); }
+    if(type === 'zart') document.getElementById('div-zart').classList.remove('hidden');
+    
+    calculate();
+}
+
+function generateOpenInputs() {
+    const n = Math.min(Math.max(parseInt(document.getElementById('n_elem').value) || 1, 1), 10);
+    const container = document.getElementById('open-element-rows');
+    container.innerHTML = '';
     for (let i = 1; i <= n; i++) {
-        const row = document.createElement('div');
-        row.className = "flex items-center gap-3";
-        row.innerHTML = `
-            <span class="w-8 text-xs font-bold text-slate-500">${i}.</span>
-            <input type="number" id="b${i}" value="80" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center outline-none focus:border-indigo-500" oninput="calculate()">
-            <input type="number" id="t${i}" value="4" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center outline-none focus:border-indigo-500" oninput="calculate()">
-        `;
-        container.appendChild(row);
+        container.innerHTML += `
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] w-4 text-slate-500">${i}.</span>
+                <input type="number" id="b${i}" value="80" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
+                <input type="number" id="t${i}" value="4" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
+            </div>`;
     }
     calculate();
 }
 
 function calculate() {
-    const n = parseInt(document.getElementById('n_elem').value) || 1;
-    let sumIt = 0;
-    let maxT = 0;
+    const type = document.getElementById('type').value;
+    const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000;
+    const L = parseFloat(document.getElementById('L').value) || 0;
+    const G = parseFloat(document.getElementById('G_val').value) || 1;
+    
+    let It = 0, Wt = 0;
     let anyWarning = false;
 
-    for (let i = 1; i <= n; i++) {
-        const b = parseFloat(document.getElementById(`b${i}`).value) || 0;
-        const t = parseFloat(document.getElementById(`t${i}`).value) || 0;
-        
-        // Ellenőrzés: b/t >= 5
-        const ratio = t > 0 ? b / t : 0;
-        const bInput = document.getElementById(`b${i}`);
-        const tInput = document.getElementById(`t${i}`);
-
-        if (ratio < 5 && b > 0) {
-            bInput.classList.add('warning-border');
-            tInput.classList.add('warning-border');
-            anyWarning = true;
-        } else {
-            bInput.classList.remove('warning-border');
-            tInput.classList.remove('warning-border');
+    if(type === 'kor') {
+        const D = parseFloat(document.getElementById('D').value) || 1;
+        It = (Math.PI * Math.pow(D, 4)) / 32;
+        Wt = It / (D/2);
+    } else if(type === 'gyuru') {
+        const D = parseFloat(document.getElementById('D').value) || 1;
+        const d = parseFloat(document.getElementById('d').value) || 0;
+        It = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32;
+        Wt = It / (D/2);
+    } else if(type === 'teglalap') {
+        const b = parseFloat(document.getElementById('rect_b').value) || 1;
+        const a = parseFloat(document.getElementById('rect_a').value) || 1;
+        const r = Math.max(b,a) / Math.min(b,a);
+        const alpha = interpolate(r, 'a'), beta = interpolate(r, 'b');
+        It = beta * Math.max(b,a) * Math.pow(Math.min(b,a), 3);
+        Wt = alpha * Math.max(b,a) * Math.pow(Math.min(b,a), 2);
+    } else if(type === 'nyitott') {
+        const n = parseInt(document.getElementById('n_elem').value) || 1;
+        let sum = 0, maxT = 0;
+        for(let i=1; i<=n; i++) {
+            const bi = parseFloat(document.getElementById(`b${i}`).value) || 0;
+            const ti = parseFloat(document.getElementById(`t${i}`).value) || 0;
+            if(ti > 0) {
+                if(bi/ti < 5) anyWarning = true;
+                sum += (bi * Math.pow(ti, 3)) / 3;
+                if(ti > maxT) maxT = ti;
+            }
         }
-
-        if (b > 0 && t > 0) {
-            sumIt += (b * Math.pow(t, 3)) / 3;
-            if (t > maxT) maxT = t;
-        }
+        It = (parseFloat(document.getElementById('eta_val').value) || 1) * sum;
+        Wt = It / maxT;
+    } else if(type === 'zart') {
+        const Ak = parseFloat(document.getElementById('Ak_val').value) || 1;
+        const t = parseFloat(document.getElementById('zart_t').value) || 1;
+        Wt = 2 * Ak * t;
+        It = (4 * Ak * Ak * t) / (4 * Math.sqrt(Ak)); // Közelítés
     }
 
-    const eta = parseFloat(document.getElementById('eta_val').value) || 1;
-    const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000;
-    const G = parseFloat(document.getElementById('G_val').value) || 1;
-    const L = parseFloat(document.getElementById('L').value) || 0;
-    const It = eta * sumIt;
-
     document.getElementById('warning-box').style.display = anyWarning ? 'flex' : 'none';
-
-    if (It > 0) {
-        const tauMax = (Mt / It) * maxT;
-        const phiRad = (Mt * L) / (G * It);
-        document.getElementById('outTau').innerText = tauMax.toFixed(2);
+    
+    if(It > 0) {
         document.getElementById('outIt').innerText = Math.round(It).toLocaleString('hu-HU');
+        document.getElementById('outTau').innerText = (Mt / Wt).toFixed(2);
+        const phiRad = (Mt * L) / (G * It);
         document.getElementById('outPhi').innerText = (phiRad * 180 / Math.PI).toFixed(4) + " °";
     }
 }
 
-window.onload = generateInputs;
+window.onload = updateUI;
 </script>
 </body>
 </html>
