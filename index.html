@@ -84,6 +84,12 @@
                 </div>
 
                 <div class="pt-4 border-t border-slate-700 space-y-3">
+                    <div class="flex items-center justify-between"><label class="math text-indigo-300">l:</label>
+                        <div class="flex gap-2 items-center">
+                            <input type="number" id="L_rod" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
+                            <select id="u-Lrod" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option></select>
+                        </div>
+                    </div>
                     <div class="flex items-center justify-between"><label class="math text-indigo-300">Mₜ:</label>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()">
@@ -128,6 +134,14 @@
                             <select id="ou-th" class="unit-select-out" onchange="calculate()"><option value="radmm">rad/mm</option><option value="radm">rad/m</option><option value="degm">°/m</option></select>
                         </div>
                         <div id="outTheta" class="text-xl font-black text-indigo-400">0.0000</div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 border-l-4 border-indigo-500">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes elfordulás (φ)</span>
+                            <select id="ou-phi" class="unit-select-out" onchange="calculate()"><option value="deg">° (fok)</option><option value="rad">rad</option></select>
+                        </div>
+                        <div id="outPhi" class="text-2xl font-black text-white">0.0000</div>
                     </div>
                 </div>
             </div>
@@ -179,7 +193,7 @@ function updateUI() {
 
 function calculate() {
     const type = document.getElementById('type').value;
-    const Mt = getV('Mt','u-Mt'), G = getV('G_val','u-G');
+    const Mt = getV('Mt','u-Mt'), G = getV('G_val','u-G'), L_rod = getV('L_rod', 'u-Lrod');
     let It = 0, Wt = 0;
 
     if(type==='kor'){ const D=getV('D','u-D'); It=(Math.PI*Math.pow(D,4))/32; Wt=It/(D/2); }
@@ -195,7 +209,7 @@ function calculate() {
         It=(4*Ak*Ak)/sum_lv; Wt=2*Ak*minV;
     }
 
-    // Eredmények kiírása
+    // Eredmények
     const uTau = parseFloat(document.getElementById('ou-tau').value);
     document.getElementById('outTau').innerText = Wt>0 ? ((Mt/Wt)/uTau).toFixed(4) : "0.0000";
     document.getElementById('outIt').innerText = (It/parseFloat(document.getElementById('ou-it').value)).toLocaleString('hu-HU');
@@ -203,6 +217,10 @@ function calculate() {
     let th = Mt/(G*It), uTh = document.getElementById('ou-th').value;
     if(uTh==='radm') th*=1000; else if(uTh==='degm') th*=1000*(180/Math.PI);
     document.getElementById('outTheta').innerText = th.toFixed(8);
+
+    let phiRad = (Mt * L_rod) / (G * It);
+    let uPhi = document.getElementById('ou-phi').value;
+    document.getElementById('outPhi').innerText = (uPhi === 'deg' ? (phiRad * 180 / Math.PI) : phiRad).toFixed(6);
 
     draw(type);
 }
