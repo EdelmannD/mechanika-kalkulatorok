@@ -74,25 +74,13 @@
                                 <select id="unit-ak" class="unit-select" onchange="calculate()"><option value="1">mm²</option><option value="100">cm²</option></select>
                             </div>
                         </div>
-                        <select id="zart_sub_type" onchange="updateZartUI()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-300 outline-none">
-                            <option value="polygon">Sokszög</option>
-                            <option value="circle">Kör</option>
-                        </select>
+                        <input type="number" id="zart_n_elem" value="" placeholder="Szakaszok száma?" min="3" max="8" class="w-full bg-slate-900 border border-indigo-500 rounded p-2 text-center font-bold text-xs" oninput="generateZartInputs()">
                     </div>
-                    <div id="zart-polygon-inputs" class="space-y-2">
-                        <div class="flex justify-between items-center pt-2">
-                            <label class="text-[10px] font-black text-indigo-400 uppercase">Szakaszok:</label>
-                            <input type="number" id="zart_n_elem" value="" placeholder="?" min="3" max="8" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateZartInputs()">
-                        </div>
-                        <div id="dynamic-zart-rows" class="space-y-2"></div>
-                    </div>
+                    <div id="dynamic-zart-rows" class="space-y-2"></div>
                 </div>
 
                 <div id="div-open-inputs" class="hidden space-y-3 pt-2 border-t border-slate-700">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám:</label>
-                        <input type="number" id="n_elem" value="" placeholder="?" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateInputs()">
-                    </div>
+                    <input type="number" id="n_elem" value="" placeholder="Elemszám?" min="1" max="10" class="w-full bg-slate-900 border border-indigo-500 rounded p-2 text-center font-bold text-xs" oninput="generateInputs()">
                     <div id="dynamic-rows" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
                 </div>
 
@@ -123,34 +111,45 @@
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Sematikus ábra</span>
-                    <canvas id="canvas" width="400" height="400" class="w-full h-auto"></canvas>
+                    <canvas id="canvas" width="400" height="400" class="w-full h-auto shadow-2xl"></canvas>
                 </div>
                 <div class="space-y-4">
-                    <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl border-b-4 border-indigo-800">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. feszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
+                    <div class="bg-indigo-600 p-5 rounded-3xl shadow-xl border-b-4 border-indigo-800">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-indigo-100 uppercase block">Max. feszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
                             <select id="out-unit-tau" class="unit-select-out" onchange="calculate()"><option value="1">MPa</option><option value="1000000">Pa</option></select>
                         </div>
                         <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                     </div>
+
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Tehetetlenségi nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
-                            <select id="out-unit-it" class="unit-select-out" onchange="calculate()"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Tehetetlenségi nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
+                            <select id="out-unit-it" class="unit-select-out" onchange="calculate()"><option value="1">mm⁴</option><option value="10000">cm⁴</option><option value="1e12">m⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
-                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Középvonal területe (<span class="math-normal">A<sub>k</sub></span>)</span>
+
+                    <div id="out-div-ak" class="hidden bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Középvonal területe (<span class="math-normal">A<sub>k</sub></span>)</span>
                             <select id="out-unit-ak" class="unit-select-out" onchange="calculate()"><option value="1">mm²</option><option value="100">cm²</option></select>
                         </div>
                         <div id="outAk" class="text-xl font-black text-white">0</div>
                     </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-normal">ϑ</span>)</span>
+                            <select id="out-unit-theta" class="unit-select-out" onchange="calculate()"><option value="radmm">rad/mm</option><option value="radm">rad/m</option><option value="degm">°/m</option></select>
+                        </div>
+                        <div id="outTheta" class="text-xl font-black text-indigo-400">0.0000</div>
+                    </div>
+
                     <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
-                        <div class="flex justify-between items-start">
-                            <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Teljes szögelfordulás (<span class="math-normal">φ</span>)</span>
-                            <select id="out-unit-phi" class="unit-select-out" onchange="calculate()"><option value="deg">fok [°]</option><option value="rad">radián [rad]</option></select>
+                        <div class="flex justify-between items-center">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes elfordulás (<span class="math-normal">φ</span>)</span>
+                            <select id="out-unit-phi" class="unit-select-out" onchange="calculate()"><option value="deg">° (fok)</option><option value="rad">rad</option></select>
                         </div>
                         <div id="outPhi" class="text-2xl font-black text-white">0.0000</div>
                     </div>
@@ -189,12 +188,12 @@ function generateInputs() {
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
         container.innerHTML += `
-            <div class="grid grid-cols-12 gap-1 items-center">
-                <span class="col-span-1 text-[10px] font-bold text-slate-500">s${i}</span>
-                <input type="number" id="Li_${i}" value="${i==1?80:40}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+            <div class="grid grid-cols-12 gap-1 items-center bg-slate-900/50 p-1 rounded">
+                <span class="col-span-1 text-[9px] font-bold text-slate-500">s${i}</span>
+                <input type="number" id="Li_${i}" value="${i==1?80:40}" class="col-span-4 p-1 bg-slate-800 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
                 <select id="uLi_${i}" class="col-span-2 unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
-                <span class="col-span-1 text-[10px] font-bold text-slate-500 text-right">v${i}</span>
-                <input type="number" id="vi_${i}" value="${i==1?4:2}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <span class="col-span-1 text-[9px] font-bold text-slate-500 text-right">v${i}</span>
+                <input type="number" id="vi_${i}" value="${i==1?4:2}" class="col-span-4 p-1 bg-slate-800 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -208,31 +207,30 @@ function generateZartInputs() {
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
         container.innerHTML += `
-            <div class="grid grid-cols-12 gap-1 items-center">
-                <span class="col-span-1 text-[10px] font-bold text-slate-500">s${i}</span>
-                <input type="number" id="zs_${i}" value="${(i%2==1)?100:60}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+            <div class="grid grid-cols-12 gap-1 items-center bg-slate-900/50 p-1 rounded">
+                <span class="col-span-1 text-[9px] font-bold text-slate-500">s${i}</span>
+                <input type="number" id="zs_${i}" value="${(i%2==1)?100:60}" class="col-span-4 p-1 bg-slate-800 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
                 <select id="uzs_${i}" class="col-span-2 unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
-                <span class="col-span-1 text-[10px] font-bold text-slate-500 text-right">v${i}</span>
-                <input type="number" id="zv_${i}" value="3" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <span class="col-span-1 text-[9px] font-bold text-slate-500 text-right">v${i}</span>
+                <input type="number" id="zv_${i}" value="3" class="col-span-4 p-1 bg-slate-800 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
-    calculate();
-}
-
-function updateZartUI() {
-    const subType = document.getElementById('zart_sub_type').value;
-    document.getElementById('zart-polygon-inputs').style.display = (subType === 'polygon') ? 'block' : 'none';
     calculate();
 }
 
 function updateUI() {
     const type = document.getElementById('type').value;
     ['div-D', 'div-d', 'div-a', 'div-b', 'div-zart-options', 'div-open-inputs'].forEach(g => document.getElementById(g).style.display = 'none');
+    document.getElementById('out-div-ak').style.display = 'none';
+
     if (type === 'kor') document.getElementById('div-D').style.display = 'flex';
     if (type === 'gyuru') { document.getElementById('div-D').style.display = 'flex'; document.getElementById('div-d').style.display = 'flex'; }
     if (type === 'teglalap') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-b').style.display = 'flex'; }
     if (type === 'nyitott') document.getElementById('div-open-inputs').style.display = 'block';
-    if (type === 'zart') { document.getElementById('div-zart-options').style.display = 'block'; updateZartUI(); }
+    if (type === 'zart') { 
+        document.getElementById('div-zart-options').style.display = 'block'; 
+        document.getElementById('out-div-ak').style.display = 'block';
+    }
     document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
     calculate();
 }
@@ -264,7 +262,6 @@ function calculate() {
         It = 1.15 * sumIt; Wt = It / (maxV || 1);
     } else if (type === 'zart') {
         Ak = getVal('z_ak_manual', 'unit-ak');
-        const subType = document.getElementById('zart_sub_type').value;
         let sum_s_v = 0, min_v = Infinity;
         const n = parseInt(document.getElementById('zart_n_elem').value) || 0;
         for(let i=1; i<=n; i++) {
@@ -274,37 +271,62 @@ function calculate() {
         It = (4 * Ak * Ak) / (sum_s_v || 1); Wt = 2 * Ak * min_v;
     }
 
-    // Kimenetek megjelenítése átváltva
-    const uAkOut = parseFloat(document.getElementById('out-unit-ak').value);
-    document.getElementById('outAk').innerText = Ak ? (Ak / uAkOut).toFixed(2) : "-";
-
     if (It > 0) {
+        // τmax
         const uTauOut = parseFloat(document.getElementById('out-unit-tau').value);
         document.getElementById('outTau').innerText = (Wt > 0) ? ((Mt / Wt) * uTauOut).toFixed(4) : "0.0000";
         
+        // It
         const uItOut = parseFloat(document.getElementById('out-unit-it').value);
-        document.getElementById('outIt').innerText = (It / uItOut).toLocaleString('hu-HU', {maximumFractionDigits: 1});
+        document.getElementById('outIt').innerText = (It / uItOut).toLocaleString('hu-HU', {maximumSignificantDigits: 7});
         
-        const phiRad = (Mt * L_total) / (G * It);
-        const phiType = document.getElementById('out-unit-phi').value;
-        document.getElementById('outPhi').innerText = (phiType === 'deg') ? (phiRad * 180 / Math.PI).toFixed(4) : phiRad.toFixed(6);
+        // Ak (csak ha látszik)
+        const uAkOut = parseFloat(document.getElementById('out-unit-ak').value);
+        document.getElementById('outAk').innerText = Ak ? (Ak / uAkOut).toFixed(2) : "0";
+
+        // Fajlagos elcsavarodás (ϑ = Mt / (G*It))
+        const thetaRadMm = Mt / (G * It);
+        const thetaUnit = document.getElementById('out-unit-theta').value;
+        let thetaDisp = 0;
+        if(thetaUnit === 'radmm') thetaDisp = thetaRadMm;
+        else if(thetaUnit === 'radm') thetaDisp = thetaRadMm * 1000;
+        else if(thetaUnit === 'degm') thetaDisp = (thetaRadMm * 1000) * (180 / Math.PI);
+        document.getElementById('outTheta').innerText = thetaDisp.toFixed(6);
+
+        // Teljes elfordulás (φ)
+        const phiRad = thetaRadMm * L_total;
+        const phiUnit = document.getElementById('out-unit-phi').value;
+        document.getElementById('outPhi').innerText = (phiUnit === 'deg') ? (phiRad * 180 / Math.PI).toFixed(4) : phiRad.toFixed(6);
     }
     drawSchema(type);
 }
 
 function drawSchema(type) {
     const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 400, 400); ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 16px Libre Baskerville";
+    ctx.clearRect(0, 0, 400, 400); 
+    ctx.strokeStyle = '#4f46e5'; ctx.fillStyle = '#4f46e5'; ctx.lineWidth = 3; 
+    ctx.font = "bold 16px Inter";
     const cx = 200, cy = 200;
-    if(type === 'kor') { ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); ctx.fillText("D", cx-8, cy-95); }
-    else if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); }
-    else if(type === 'teglalap') { ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5); }
-    else if(type === 'nyitott') {
-        ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+40); ctx.lineTo(cx+40, cy+40); ctx.lineTo(cx+40, cy-20); ctx.stroke();
-    }
-    else if(type === 'zart') {
-        ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-50, 140, 100);
-        ctx.setLineDash([]); ctx.fillText("Ak", cx-12, cy+5);
+
+    if(type === 'kor') { 
+        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); 
+        ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(cx-80, cy); ctx.lineTo(cx+80, cy); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillText("D", cx-5, cy-90);
+    } else if(type === 'gyuru') { 
+        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); 
+        ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); 
+        ctx.fillText("D", cx-5, cy-90); ctx.fillText("d", cx-5, cy-30);
+    } else if(type === 'teglalap') { 
+        ctx.strokeRect(cx-100, cy-50, 200, 100); 
+        ctx.fillText("b", cx-5, cy-60); ctx.fillText("a", cx+110, cy+5); 
+    } else if(type === 'nyitott') {
+        ctx.lineWidth = 10; ctx.lineCap = "round";
+        ctx.beginPath(); ctx.moveTo(cx-80, cy-40); ctx.lineTo(cx-80, cy+40); ctx.lineTo(cx+80, cy+40); ctx.stroke();
+        ctx.fillText("v", cx-95, cy);
+    } else if(type === 'zart') {
+        ctx.lineWidth = 2; ctx.setLineDash([2, 2]); ctx.strokeRect(cx-80, cy-60, 160, 120);
+        ctx.setLineDash([]); ctx.lineWidth = 4; ctx.strokeRect(cx-85, cy-65, 170, 130);
+        ctx.fillText("Ak", cx-12, cy+5);
     }
 }
 window.onload = updateUI;
