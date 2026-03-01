@@ -100,7 +100,7 @@
                         </div>
                         <div id="outTheta" class="text-xl font-black text-indigo-400">0</div>
                     </div>
-                    <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500">
+                    <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-normal">&phi;</span>)</span>
                             <select id="phi_unit_res" onchange="calculate()" class="unit-select"><option value="deg">&deg;</option><option value="rad">rad</option></select>
@@ -114,6 +114,7 @@
 </div>
 
 <script>
+// UI frissítése a típusváltáskor
 function updateUI() {
     const type = document.getElementById('type').value;
     const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak'];
@@ -129,6 +130,7 @@ function updateUI() {
     calculate();
 }
 
+// Kizárólag geometriai méretvonalak rajzolása (tau mentes!)
 function drawSchema(type) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -140,29 +142,29 @@ function drawSchema(type) {
 
     if(type === 'kor' || type === 'gyuru') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        // D méretvonal
         ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(cx-80, cy-100); ctx.lineTo(cx+80, cy-100); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx-80, cy-95); ctx.lineTo(cx-80, cy-105); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx+80, cy-95); ctx.lineTo(cx+80, cy-105); ctx.stroke();
-        ctx.fillText("D", cx-8, cy-115);
+        // D méretvonal
+        ctx.beginPath(); ctx.moveTo(cx-80, cy-110); ctx.lineTo(cx+80, cy-110); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-80, cy-105); ctx.lineTo(cx-80, cy-115); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx+80, cy-105); ctx.lineTo(cx+80, cy-115); ctx.stroke();
+        ctx.fillText("D", cx-8, cy-125);
         
         if(type === 'gyuru') {
             ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
             ctx.lineWidth = 1;
-            ctx.beginPath(); ctx.moveTo(cx-50, cy+20); ctx.lineTo(cx+50, cy+20); ctx.stroke();
-            ctx.fillText("d", cx-5, cy+45);
+            ctx.beginPath(); ctx.moveTo(cx-50, cy+30); ctx.lineTo(cx+50, cy+30); ctx.stroke();
+            ctx.fillText("d", cx-5, cy+55);
         }
     } 
     else if(type === 'teglalap') {
-        ctx.strokeRect(cx-100, cy-60, 200, 120);
+        ctx.strokeRect(cx-110, cy-60, 220, 120);
         ctx.lineWidth = 1;
         // b méret
-        ctx.beginPath(); ctx.moveTo(cx-100, cy-80); ctx.lineTo(cx+100, cy-80); ctx.stroke();
-        ctx.fillText("b", cx-5, cy-95);
+        ctx.beginPath(); ctx.moveTo(cx-110, cy-85); ctx.lineTo(cx+110, cy-85); ctx.stroke();
+        ctx.fillText("b", cx-5, cy-100);
         // a méret
-        ctx.beginPath(); ctx.moveTo(cx+120, cy-60); ctx.lineTo(cx+120, cy+60); ctx.stroke();
-        ctx.fillText("a", cx+135, cy+5);
+        ctx.beginPath(); ctx.moveTo(cx+130, cy-60); ctx.lineTo(cx+130, cy+60); ctx.stroke();
+        ctx.fillText("a", cx+145, cy+5);
     }
     else if(type === 'nyitott') {
         ctx.lineWidth = 4;
@@ -173,15 +175,16 @@ function drawSchema(type) {
     }
     else if(type === 'zart') {
         ctx.lineWidth = 3; ctx.setLineDash([5, 5]);
-        ctx.strokeRect(cx-70, cy-70, 140, 140);
+        ctx.strokeRect(cx-75, cy-75, 150, 150);
         ctx.setLineDash([]);
-        ctx.fillText("Ak", cx-12, cy+5);
-        ctx.fillText("t", cx-90, cy-50);
+        ctx.fillText("A k", cx-12, cy+5);
+        ctx.fillText("t", cx-95, cy-50);
         ctx.lineWidth = 1;
-        ctx.beginPath(); ctx.moveTo(cx-80, cy-70); ctx.lineTo(cx-60, cy-70); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx-85, cy-75); ctx.lineTo(cx-65, cy-75); ctx.stroke();
     }
 }
 
+// Számítási logika
 function calculate() {
     try {
         const type = document.getElementById('type').value;
