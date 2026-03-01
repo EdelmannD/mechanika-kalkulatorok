@@ -4,117 +4,116 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Mechanika - Csavarás Profi Ellenőrző</title>
+    <title>Mechanika Profi Kalkulátor</title>
     <style>
-        canvas { background-color: #ffffff; border: 2px solid #cbd5e1; border-radius: 1rem; }
-        .unit-select { font-size: 0.7rem; padding: 2px; border-radius: 4px; background: #f1f5f9; border: 1px solid #cbd5e1; margin-left: 5px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        canvas { background-color: #0f172a; border-radius: 1.5rem; }
+        * { font-style: normal !important; } /* Dőlt betűk tiltása */
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 md:p-8 text-slate-800 font-sans">
+<body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
 
-<div class="max-w-6xl mx-auto bg-white shadow-2xl rounded-[2rem] overflow-hidden border border-slate-200">
-    <div class="bg-gradient-to-r from-slate-900 to-indigo-950 p-6 text-white text-center border-b-4 border-indigo-500">
-        <h1 class="text-3xl font-black italic tracking-tighter">CSAVARÁS: FESZÜLTSÉG ÉS MÉRETEZÉS</h1>
-        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest mt-1">Interaktív oktatói segédlet az I-III. előadásokhoz</p>
+<div class="max-w-7xl mx-auto">
+    <div class="mb-8 flex justify-between items-end">
+        <div>
+            <h1 class="text-4xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika II.</h1>
+            <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Prizmatikus rudak szabad csavarása</p>
+        </div>
+        <div class="text-right">
+            <span class="bg-indigo-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Bánki Donát Kar</span>
+        </div>
     </div>
 
-    <div class="p-6 grid lg:grid-cols-12 gap-8">
-        <div class="lg:col-span-4 space-y-4">
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-2">1. Szelvény típusa</label>
-                <select id="type" onchange="updateUI()" class="w-full p-2 border-2 border-slate-200 rounded-lg font-bold bg-white focus:border-indigo-500 outline-none transition-all">
-                    <option value="kor">Kör keresztmetszet</option>
-                    <option value="gyuru">Vastagfalú gyűrű</option>
+    <div class="grid lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-4 space-y-6">
+            <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-2xl">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-4 tracking-widest">Keresztmetszet Kiválasztása</label>
+                <select id="type" onchange="updateUI()" class="w-full p-4 bg-slate-900 border-2 border-slate-700 rounded-2xl font-bold text-indigo-400 focus:border-indigo-500 outline-none transition-all">
+                    <option value="kor">Kör szelvény</option>
+                    <option value="gyuru">Körgyűrű szelvény</option>
                     <option value="teglalap">Téglalap (Saint-Venant)</option>
                     <option value="nyitott">Vékonyfalú nyitott</option>
                     <option value="zart">Vékonyfalú zárt (Bredt)</option>
                 </select>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-3 shadow-sm">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase border-b pb-1">Geometria [mm]</h3>
-                <div id="div-D"><label class="text-xs font-bold">D:</label><input type="number" id="D" class="w-20 p-1 border rounded ml-2" value="60" oninput="calculate()"></div>
-                <div id="div-d" class="hidden"><label class="text-xs font-bold">d:</label><input type="number" id="d" class="w-20 p-1 border rounded ml-2" value="40" oninput="calculate()"></div>
-                <div id="div-a" class="hidden"><label class="text-xs font-bold">b (hosszabb):</label><input type="number" id="a_val" class="w-20 p-1 border rounded ml-2" value="80" oninput="calculate()"></div>
-                <div id="div-b" class="hidden"><label class="text-xs font-bold">a (rövidebb):</label><input type="number" id="b_val" class="w-20 p-1 border rounded ml-2" value="40" oninput="calculate()"></div>
-                <div id="div-t" class="hidden"><label class="text-xs font-bold">t (vastagság):</label><input type="number" id="t_val" class="w-20 p-1 border rounded ml-2" value="3" oninput="calculate()"></div>
-                <div id="div-Am" class="hidden"><label class="text-xs font-bold">Am (terület):</label><input type="number" id="Am_val" class="w-32 p-1 border rounded ml-2" value="2400" oninput="calculate()"></div>
-            </div>
+            <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700 space-y-4 shadow-2xl">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2 mb-4">Geometria és Terhelés</h3>
+                
+                <div id="div-D" class="flex items-center justify-between"><label class="text-xs font-bold uppercase">Külső átmérő (D):</label><input type="number" id="D" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center" value="60" oninput="calculate()"></div>
+                <div id="div-d" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">Belső átmérő (d):</label><input type="number" id="d" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center" value="40" oninput="calculate()"></div>
+                <div id="div-a" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">Oldal 'b':</label><input type="number" id="a_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center" value="80" oninput="calculate()"></div>
+                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">Oldal 'a':</label><input type="number" id="b_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center" value="40" oninput="calculate()"></div>
+                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">Vastagság (t):</label><input type="number" id="t_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center" value="3" oninput="calculate()"></div>
+                <div id="div-Am" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase text-indigo-400">Terület (Am):</label><input type="number" id="Am_val" class="w-24 p-2 bg-slate-900 border border-indigo-900 rounded-xl text-center" value="2400" oninput="calculate()"></div>
 
-            <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100 space-y-3">
-                <h3 class="text-[10px] font-black text-indigo-400 uppercase border-b border-indigo-200 pb-1">Terhelés és Anyag</h3>
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold">Nyomaték (Mt):</label>
-                    <div class="flex">
-                        <input type="number" id="Mt" class="w-20 p-1 border rounded" value="500" oninput="calculate()">
-                        <select id="Mt_unit" onchange="calculate()" class="unit-select">
+                <hr class="border-slate-700 my-4">
+
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center text-[10px] font-black uppercase text-slate-500">Nyomaték (Mt)</div>
+                    <div class="flex gap-2">
+                        <input type="number" id="Mt" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center font-bold" value="500" oninput="calculate()">
+                        <select id="Mt_unit" onchange="calculate()" class="bg-slate-700 p-2 rounded-xl text-[10px] font-bold uppercase">
                             <option value="1000">Nm</option>
                             <option value="1000000">kNm</option>
                         </select>
                     </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold">G modulus:</label>
-                    <div class="flex">
-                        <input type="number" id="G" class="w-20 p-1 border rounded" value="80" oninput="calculate()">
-                        <select id="G_unit" onchange="calculate()" class="unit-select">
+                    <div class="flex justify-between items-center text-[10px] font-black uppercase text-slate-500">G modulus</div>
+                    <div class="flex gap-2">
+                        <input type="number" id="G" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-xl text-center font-bold" value="80" oninput="calculate()">
+                        <select id="G_unit" onchange="calculate()" class="bg-slate-700 p-2 rounded-xl text-[10px] font-bold uppercase">
                             <option value="1000">GPa</option>
                             <option value="1">MPa</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <label class="text-xs font-bold">Rúd hossza (L):</label>
-                    <div class="flex">
-                        <input type="number" id="L" class="w-20 p-1 border rounded" value="1" oninput="calculate()">
-                        <select id="L_unit" onchange="calculate()" class="unit-select">
-                            <option value="1000">m</option>
-                            <option value="1">mm</option>
                         </select>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="lg:col-span-8 flex flex-col gap-6">
-            <div class="grid md:grid-cols-2 gap-6 items-start">
-                <div class="space-y-2">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Feszültségeloszlás diagram</span>
-                    <canvas id="canvas" width="400" height="400" class="w-full h-auto aspect-square shadow-xl"></canvas>
+        <div class="lg:col-span-8 flex flex-col gap-8">
+            <div class="grid md:grid-cols-2 gap-8 h-full">
+                <div class="relative">
+                    <span class="absolute top-4 left-6 text-[10px] font-black text-slate-500 uppercase tracking-widest">Feszültségeloszlás diagram</span>
+                    <canvas id="canvas" width="450" height="450" class="w-full h-auto aspect-square"></canvas>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="p-6 bg-slate-900 rounded-3xl text-white shadow-lg border-b-8 border-indigo-500">
-                        <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1 italic">Max. csúsztatófeszültség</p>
-                        <div class="flex items-baseline gap-2">
-                            <span id="outTau" class="text-5xl font-mono font-black tracking-tighter text-white">-</span>
-                            <span class="text-lg font-bold text-slate-400 uppercase">MPa</span>
+                <div class="flex flex-col gap-4">
+                    <div class="bg-indigo-600 p-8 rounded-[2.5rem] shadow-2xl shadow-indigo-500/20">
+                        <p class="text-[10px] font-black text-indigo-200 uppercase tracking-widest mb-2 leading-none">Max. csúsztatófeszültség</p>
+                        <div class="flex items-baseline justify-between">
+                            <h2 id="outTau" class="text-6xl font-900 tracking-tighter">-</h2>
+                            <select id="tau_unit" onchange="calculate()" class="bg-indigo-700 text-[10px] font-black uppercase px-2 py-1 rounded-lg">
+                                <option value="1">MPa</option>
+                                <option value="0.1">bar</option>
+                                <option value="100">N/cm²</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block">It [mm⁴]</span>
-                            <span id="outIt" class="text-lg font-mono font-bold">-</span>
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-1">
+                            <span id="labelInertia" class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Inercia nyomaték</span>
+                            <select id="it_unit" onchange="calculate()" class="bg-slate-700 text-[9px] font-bold uppercase px-2 py-1 rounded">
+                                <option value="1">mm⁴</option>
+                                <option value="0.0001">cm⁴</option>
+                            </select>
                         </div>
-                        <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
-                            <span class="text-[9px] font-bold text-slate-400 uppercase block">Wt [mm³]</span>
-                            <span id="outWt" class="text-lg font-mono font-bold">-</span>
-                        </div>
+                        <div id="outIt" class="text-2xl font-black text-slate-100">-</div>
                     </div>
 
-                    <div class="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl">
-                        <span class="text-[9px] font-bold text-indigo-400 uppercase block">Elcsavarodási szög (φ)</span>
-                        <div class="flex justify-between items-center mt-1">
-                            <span id="outPhiDeg" class="text-2xl font-mono font-black text-indigo-950">-</span>
-                            <span class="text-xs font-bold text-indigo-400 uppercase italic">Fok [°]</span>
+                    <div class="bg-slate-800 p-6 rounded-3xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Szögelfordulás (φ)</span>
+                            <select id="phi_unit" onchange="calculate()" class="bg-slate-700 text-[9px] font-bold uppercase px-2 py-1 rounded">
+                                <option value="deg">Fok (°)</option>
+                                <option value="rad">Radián</option>
+                            </select>
                         </div>
+                        <div id="outPhi" class="text-2xl font-black text-indigo-400">-</div>
                     </div>
                 </div>
-            </div>
-            
-            <div id="theoryBox" class="bg-amber-50 p-4 rounded-2xl border-l-4 border-amber-400 text-xs text-amber-900 leading-relaxed italic">
-                A számításhoz válasszon típust és adjon meg érvényes adatokat.
             </div>
         </div>
     </div>
@@ -134,55 +133,61 @@ function updateUI() {
     if (type === 'teglalap') { document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-b').classList.remove('hidden'); }
     if (type === 'nyitott') { document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-t').classList.remove('hidden'); }
     if (type === 'zart') { document.getElementById('div-Am').classList.remove('hidden'); document.getElementById('div-t').classList.remove('hidden'); }
+
+    // Label javítása
+    document.getElementById('labelInertia').innerText = (type === 'kor' || type === 'gyuru') ? "Poláris nyomaték (Ip)" : "Torziós nyomaték (It)";
+    
     calculate();
 }
 
-function drawStress(type, params) {
+function drawStress(type, Mt_ratio) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
+    const scale = 140;
+    
+    ctx.strokeStyle = '#475569';
     ctx.lineWidth = 2;
 
     if (type === 'kor' || type === 'gyuru') {
-        const R = 100;
-        const r_in = type === 'gyuru' ? (params.d / params.D) * R : 0;
-        
-        // Szelvény
-        ctx.strokeStyle = '#1e293b';
-        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.stroke();
-        if(r_in > 0) { ctx.beginPath(); ctx.arc(cx, cy, r_in, 0, Math.PI*2); ctx.stroke(); }
+        const d_val = parseFloat(document.getElementById('d').value);
+        const D_val = parseFloat(document.getElementById('D').value);
+        const innerScale = type === 'gyuru' ? (d_val/D_val) * scale : 0;
 
-        // Feszültség nyilak (Lineáris eloszlás)
-        ctx.strokeStyle = '#f43f5e';
-        for(let a=0; a<Math.PI*2; a+=Math.PI/6) {
+        // Rajz
+        ctx.beginPath(); ctx.arc(cx, cy, scale, 0, Math.PI*2); ctx.stroke();
+        if(innerScale > 0) { ctx.beginPath(); ctx.arc(cx, cy, innerScale, 0, Math.PI*2); ctx.stroke(); }
+
+        // Feszültség diagram nyilak
+        ctx.strokeStyle = '#6366f1';
+        ctx.lineWidth = 3;
+        for(let a=0; a<Math.PI*2; a+=Math.PI/4) {
+            let startX = cx + Math.cos(a) * innerScale;
+            let startY = cy + Math.sin(a) * innerScale;
+            let endX = cx + Math.cos(a) * scale;
+            let endY = cy + Math.sin(a) * scale;
+            
             ctx.beginPath();
-            ctx.moveTo(cx + Math.cos(a)*r_in, cy + Math.sin(a)*r_in);
-            ctx.lineTo(cx + Math.cos(a)*R, cy + Math.sin(a)*R);
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
             ctx.stroke();
-            // Nyílhegy a szélén
-            let tx = cx + Math.cos(a)*R; let ty = cy + Math.sin(a)*R;
-            ctx.beginPath(); ctx.arc(tx, ty, 3, 0, 7); ctx.fill();
+            // Max pont jelölése
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath(); ctx.arc(endX, endY, 4, 0, 7); ctx.fill();
         }
     } else if (type === 'teglalap') {
-        const w = 160; const h = 80;
-        ctx.strokeStyle = '#1e293b';
-        ctx.strokeRect(cx-w/2, cy-h/2, w, h);
-        // Max feszültség helye (Saint-Venant szerint a hosszabb oldal közepén)
+        ctx.strokeRect(cx-120, cy-60, 240, 120);
         ctx.fillStyle = '#f43f5e';
-        ctx.beginPath(); ctx.arc(cx, cy-h/2, 8, 0, 7); ctx.fill();
-        ctx.beginPath(); ctx.arc(cx, cy+h/2, 8, 0, 7); ctx.fill();
-        ctx.font = "10px Arial"; ctx.fillText("τ_max", cx+10, cy-h/2);
+        ctx.beginPath(); ctx.arc(cx, cy-60, 6, 0, 7); ctx.fill(); // tau_max helye
+        ctx.beginPath(); ctx.arc(cx, cy+60, 6, 0, 7); ctx.fill();
     } else if (type === 'nyitott') {
-        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.moveTo(cx-80, cy-40); ctx.lineTo(cx+80, cy-40); ctx.lineTo(cx+80, cy+40); ctx.stroke();
-        // Feszültségeloszlás a fal mentén
-        ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]);
-        ctx.strokeRect(cx-84, cy-44, 168, 88); ctx.setLineDash([]);
+        ctx.beginPath(); ctx.moveTo(cx-100, cy-40); ctx.lineTo(cx+100, cy-40); ctx.lineTo(cx+100, cy+40); ctx.stroke();
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx+100, cy, 6, 0, 7); ctx.fill();
     } else if (type === 'zart') {
-        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 6;
-        ctx.strokeRect(cx-70, cy-70, 140, 140);
-        ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1;
-        ctx.strokeRect(cx-65, cy-65, 130, 130);
+        ctx.strokeRect(cx-80, cy-80, 160, 160);
+        ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 1; ctx.strokeRect(cx-76, cy-76, 152, 152);
+        ctx.fillStyle = '#f43f5e'; ctx.beginPath(); ctx.arc(cx+80, cy, 6, 0, 7); ctx.fill();
     }
 }
 
@@ -190,53 +195,53 @@ function calculate() {
     const type = document.getElementById('type').value;
     const Mt = parseFloat(document.getElementById('Mt').value) * parseFloat(document.getElementById('Mt_unit').value);
     const G = parseFloat(document.getElementById('G').value) * parseFloat(document.getElementById('G_unit').value);
-    const L = parseFloat(document.getElementById('L').value) * parseFloat(document.getElementById('L_unit').value);
+    const L = 1000; // Alapértelmezett 1m
 
-    let It, Wt, theory;
-    let params = {};
+    let IpIt, Wt;
 
     if (type === 'kor') {
-        params.D = parseFloat(document.getElementById('D').value);
-        It = (Math.PI * Math.pow(params.D, 4)) / 32;
-        Wt = It / (params.D / 2);
-        theory = "Kör rúd: Lineáris feszültségeloszlás a sugár mentén (τ = Mt/Ip * r).";
+        const D = parseFloat(document.getElementById('D').value);
+        IpIt = (Math.PI * Math.pow(D, 4)) / 32;
+        Wt = IpIt / (D / 2);
     } else if (type === 'gyuru') {
-        params.D = parseFloat(document.getElementById('D').value);
-        params.d = parseFloat(document.getElementById('d').value);
-        It = (Math.PI * (Math.pow(params.D, 4) - Math.pow(params.d, 4))) / 32;
-        Wt = It / (params.D / 2);
-        theory = "Gyűrű: τ_max a külső szálban, τ_min a belső furat mentén.";
+        const D = parseFloat(document.getElementById('D').value);
+        const d = parseFloat(document.getElementById('d').value);
+        IpIt = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32;
+        Wt = IpIt / (D / 2);
     } else if (type === 'teglalap') {
         const b = parseFloat(document.getElementById('a_val').value);
         const a = parseFloat(document.getElementById('b_val').value);
         let r = b/a; let alpha = 0.208, beta = 0.141;
         if(r >= 10) { alpha = 0.312; beta = 0.312; } else if(r >= 2) { alpha = 0.246; beta = 0.229; }
-        It = beta * b * Math.pow(a, 3);
+        IpIt = beta * b * Math.pow(a, 3);
         Wt = alpha * b * Math.pow(a, 2);
-        theory = "Téglalap: Saint-Venant elv. A sarkokban a feszültség nulla!";
     } else if (type === 'nyitott') {
         const b = parseFloat(document.getElementById('a_val').value);
         const t = parseFloat(document.getElementById('t_val').value);
-        It = (b * Math.pow(t, 3)) / 3;
-        Wt = It / t;
-        theory = "Nyitott szelvény: τ_max = Mt/It * t. Nagyon alacsony merevség.";
+        IpIt = (b * Math.pow(t, 3)) / 3;
+        Wt = IpIt / t;
     } else if (type === 'zart') {
         const Am = parseFloat(document.getElementById('Am_val').value);
         const t = parseFloat(document.getElementById('t_val').value);
         Wt = 2 * Am * t;
-        It = (4 * Am * Am * t) / (4 * Math.sqrt(Am)); // Közelítő
-        theory = "Bredt-képlet: Zárt szelvényben a nyírófolyam állandó (q = τ·t).";
+        IpIt = (4 * Am * Am * t) / (4 * Math.sqrt(Am));
     }
 
-    const tau = Mt / Wt;
-    const phi = (Mt * L / (G * It)) * (180 / Math.PI);
-
+    const tau = (Mt / Wt) * parseFloat(document.getElementById('tau_unit').value);
+    const phiRad = (Mt * L) / (G * IpIt);
+    const itDisp = IpIt * parseFloat(document.getElementById('it_unit').value);
+    
+    // Megjelenítés
     document.getElementById('outTau').innerText = tau.toFixed(2);
-    document.getElementById('outIt').innerText = Math.round(It).toLocaleString('hu-HU');
-    document.getElementById('outWt').innerText = Math.round(Wt).toLocaleString('hu-HU');
-    document.getElementById('outPhiDeg').innerText = phi.toFixed(4) + "°";
-    document.getElementById('theoryBox').innerText = theory;
-    drawStress(type, params);
+    document.getElementById('outIt').innerText = itDisp.toLocaleString('hu-HU', {maximumFractionDigits: 0});
+    
+    if(document.getElementById('phi_unit').value === 'deg') {
+        document.getElementById('outPhi').innerText = (phiRad * 180 / Math.PI).toFixed(4) + "°";
+    } else {
+        document.getElementById('outPhi').innerText = phiRad.toFixed(6) + " rad";
+    }
+
+    drawStress(type, 1);
 }
 
 window.onload = updateUI;
