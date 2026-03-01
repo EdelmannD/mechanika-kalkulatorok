@@ -13,6 +13,7 @@
         .math-normal { font-family: 'Libre Baskerville', serif; font-style: normal; text-transform: none !important; }
         .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; margin-left: 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .warning-border { border: 2px solid #ef4444 !important; background-color: rgba(239, 68, 68, 0.1) !important; }
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
@@ -20,7 +21,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika válogatott fejezetei</h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Prizmatikus rudak ellenőrzése</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Összetett Kalkulátor</p>
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8">
@@ -31,7 +32,7 @@
                     <option value="kor">Kör szelvény</option>
                     <option value="gyuru">Körgyűrű szelvény</option>
                     <option value="teglalap">Téglalap (Saint-Venant)</option>
-                    <option value="nyitott">Vékonyfalú nyitott</option>
+                    <option value="nyitott">Vékonyfalú nyitott (Dinamikus)</option>
                     <option value="zart">Vékonyfalú zárt (Bredt)</option>
                 </select>
             </div>
@@ -58,6 +59,18 @@
                     <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
                 </div>
 
+                <div id="div-dynamic-open" class="hidden space-y-3 pt-2 border-t border-slate-700">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám:</label>
+                        <input type="number" id="n_elem" value="3" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center" oninput="generateInputs()">
+                    </div>
+                    <div id="dynamic-rows" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
+                    <div class="flex justify-between items-center pt-2">
+                        <label class="text-[10px] math text-indigo-300">η korrekció:</label>
+                        <input type="number" id="eta_val" value="1.15" step="0.05" class="w-16 bg-slate-900 border border-slate-700 rounded text-center" oninput="calculate()">
+                    </div>
+                </div>
+
                 <div class="pt-4 border-t border-slate-700 space-y-3">
                     <div class="flex items-center justify-between"><label class="text-sm math">G:</label>
                         <div class="flex items-center"><input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()"><select id="G_unit" onchange="calculate()" class="unit-select"><option value="1">MPa</option><option value="1000">GPa</option></select></div>
@@ -73,6 +86,11 @@
         </div>
 
         <div class="lg:col-span-8 flex flex-col gap-6">
+            <div id="warning-box" class="hidden bg-red-900/40 border border-red-500 p-3 rounded-xl flex items-center gap-3 animate-pulse">
+                <span class="text-xl">⚠️</span>
+                <p class="text-[10px] font-black uppercase">Vékonyfalú feltétel (b/t ≥ 5) nem teljesül!</p>
+            </div>
+            
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Jelölési vázlat</span>
@@ -80,7 +98,7 @@
                 </div>
                 <div class="space-y-4">
                     <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl">
-                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-normal">&tau;<sub>max</sub></span>)</span>
+                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. feszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
                         <div class="flex justify-between items-center">
                             <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
@@ -94,16 +112,13 @@
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-normal">&vartheta;</span>)</span>
-                            <select id="theta_unit" onchange="calculate()" class="unit-select"><option value="rad">rad/m</option><option value="deg">fok/m</option></select>
-                        </div>
-                        <div id="outTheta" class="text-xl font-black text-indigo-400">0</div>
+                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Fajlagos elcsavarodás (<span class="math-normal">ϑ</span>)</span>
+                        <div id="outTheta" class="text-xl font-black text-indigo-400">0 rad/m</div>
                     </div>
                     <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-normal">&phi;</span>)</span>
-                            <select id="phi_unit_res" onchange="calculate()" class="unit-select"><option value="deg">&deg;</option><option value="rad">rad</option></select>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-normal">φ</span>)</span>
+                            <select id="phi_unit_res" onchange="calculate()" class="unit-select"><option value="deg">°</option><option value="rad">rad</option></select>
                         </div>
                         <div id="outPhi" class="text-2xl font-black text-white">0.0000</div>
                     </div>
@@ -133,17 +148,92 @@ function interpolate(ratio, key) {
     }
 }
 
+function generateInputs() {
+    const n = Math.max(1, parseInt(document.getElementById('n_elem').value) || 1);
+    const container = document.getElementById('dynamic-rows');
+    container.innerHTML = '';
+    for(let i=1; i<=n; i++) {
+        container.innerHTML += `
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] w-4 font-bold text-slate-500">${i}.</span>
+                <input type="number" id="bn_${i}" value="80" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
+                <input type="number" id="tn_${i}" value="4" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
+            </div>`;
+    }
+    calculate();
+}
+
 function updateUI() {
     const type = document.getElementById('type').value;
-    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak'];
-    groups.forEach(g => document.getElementById(g).style.display = 'none');
+    const ids = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak', 'div-dynamic-open'];
+    ids.forEach(id => document.getElementById(id).style.display = 'none');
+
     if (type === 'kor') document.getElementById('div-D').style.display = 'flex';
     if (type === 'gyuru') { document.getElementById('div-D').style.display = 'flex'; document.getElementById('div-d').style.display = 'flex'; }
     if (type === 'teglalap') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-b').style.display = 'flex'; }
-    if (type === 'nyitott') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
+    if (type === 'nyitott') document.getElementById('div-dynamic-open').style.display = 'block';
     if (type === 'zart') { document.getElementById('div-Ak').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
+    
     document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
-    calculate();
+    if(type === 'nyitott') generateInputs(); else calculate();
+}
+
+function calculate() {
+    try {
+        const type = document.getElementById('type').value;
+        const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * (parseFloat(document.getElementById('Mt_unit').value));
+        const L = (parseFloat(document.getElementById('L').value) || 0) * (parseFloat(document.getElementById('L_unit').value));
+        const G = (parseFloat(document.getElementById('G_val').value) || 80000) * (parseFloat(document.getElementById('G_unit').value));
+        
+        let It = 0, Wt = 0, anyWarning = false;
+
+        if (type === 'kor') {
+            const D = (parseFloat(document.getElementById('D').value) || 1) * (parseFloat(document.getElementById('D_unit').value));
+            It = (Math.PI * Math.pow(D, 4)) / 32; Wt = It / (D / 2);
+        } else if (type === 'gyuru') {
+            const D = (parseFloat(document.getElementById('D').value) || 1) * (parseFloat(document.getElementById('D_unit').value));
+            const d = (parseFloat(document.getElementById('d').value) || 0) * (parseFloat(document.getElementById('d_unit').value));
+            It = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32; Wt = It / (D / 2);
+        } else if (type === 'teglalap') {
+            const b_in = (parseFloat(document.getElementById('a_val').value) || 1) * (parseFloat(document.getElementById('a_unit').value));
+            const a_in = (parseFloat(document.getElementById('b_val').value) || 1) * (parseFloat(document.getElementById('b_unit').value));
+            const b = Math.max(a_in, b_in), a = Math.min(a_in, b_in), r = b / a;
+            const alpha = interpolate(r, 'a'), beta = interpolate(r, 'b');
+            It = beta * b * Math.pow(a, 3); Wt = alpha * b * Math.pow(a, 2);
+        } else if (type === 'nyitott') {
+            const n = parseInt(document.getElementById('n_elem').value) || 1;
+            let sumIt = 0, maxT = 0;
+            for(let i=1; i<=n; i++) {
+                const bn = parseFloat(document.getElementById(`bn_${i}`).value) || 0;
+                const tn = parseFloat(document.getElementById(`tn_${i}`).value) || 0;
+                const bIn = document.getElementById(`bn_${i}`), tIn = document.getElementById(`tn_${i}`);
+                if(tn > 0) {
+                    if(bn/tn < 5) { anyWarning = true; bIn.classList.add('warning-border'); tIn.classList.add('warning-border'); }
+                    else { bIn.classList.remove('warning-border'); tIn.classList.remove('warning-border'); }
+                    sumIt += (bn * Math.pow(tn, 3)) / 3;
+                    if(tn > maxT) maxT = tn;
+                }
+            }
+            It = (parseFloat(document.getElementById('eta_val').value) || 1) * sumIt;
+            Wt = It / (maxT || 1);
+        } else if (type === 'zart') {
+            const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
+            const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
+            Wt = 2 * Ak * t; It = (4 * Ak * Ak * t) / (4 * Math.sqrt(Ak)); 
+        }
+
+        document.getElementById('warning-box').style.display = anyWarning ? 'flex' : 'none';
+
+        if (It > 0) {
+            document.getElementById('outTau').innerText = (Mt / Wt / parseFloat(document.getElementById('tau_unit').value)).toFixed(4);
+            document.getElementById('outIt').innerText = (It / parseFloat(document.getElementById('inertia_unit').value)).toLocaleString('hu-HU', {maximumFractionDigits: 2});
+            const thetaRadM = (Mt / (G * It)) * 1000;
+            document.getElementById('outTheta').innerText = thetaRadM.toFixed(8) + " rad/m";
+            const phiRad = thetaRadM * (L / 1000);
+            document.getElementById('outPhi').innerHTML = document.getElementById('phi_unit_res').value === 'deg' ? (phiRad * 180 / Math.PI).toFixed(4) + " °" : phiRad.toFixed(6) + " rad";
+        }
+        drawSchema(type);
+    } catch(e) {}
 }
 
 function drawSchema(type) {
@@ -153,64 +243,19 @@ function drawSchema(type) {
     ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 18px Libre Baskerville";
     if(type === 'kor' || type === 'gyuru') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx-80, cy-110); ctx.lineTo(cx+80, cy-110); ctx.stroke();
-        ctx.fillText("D", cx-8, cy-125);
-        if(type === 'gyuru') { ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); ctx.fillText("d", cx-5, cy+55); }
+        if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); }
+        ctx.fillText("D", cx-8, cy-95);
     } else if(type === 'teglalap') {
-        ctx.strokeRect(cx-110, cy-60, 220, 120);
-        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx-110, cy-85); ctx.lineTo(cx+110, cy-85); ctx.stroke(); ctx.fillText("b", cx-5, cy-100);
-        ctx.beginPath(); ctx.moveTo(cx+130, cy-60); ctx.lineTo(cx+130, cy+60); ctx.stroke(); ctx.fillText("a", cx+145, cy+5);
+        ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
     } else if(type === 'nyitott') {
-        ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
-        ctx.lineWidth = 1; ctx.fillText("b", cx-40, cy+85); ctx.fillText("t", cx-100, cy);
+        ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
+        ctx.fillText("b", cx, cy+85); ctx.fillText("t", cx-110, cy);
     } else if(type === 'zart') {
-        ctx.setLineDash([5, 5]); ctx.strokeRect(cx-75, cy-75, 150, 150); ctx.setLineDash([]);
-        ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-95, cy-50);
+        ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-70, 140, 140); ctx.setLineDash([]);
+        ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-90, cy-50);
     }
 }
 
-function calculate() {
-    try {
-        const type = document.getElementById('type').value;
-        const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * (parseFloat(document.getElementById('Mt_unit').value));
-        const L = (parseFloat(document.getElementById('L').value) || 0) * (parseFloat(document.getElementById('L_unit').value));
-        const G = (parseFloat(document.getElementById('G_val').value) || 80000) * (parseFloat(document.getElementById('G_unit').value));
-        let IpIt = 0, Wt = 0;
-
-        if (type === 'teglalap') {
-            const b_in = (parseFloat(document.getElementById('a_val').value) || 1) * (parseFloat(document.getElementById('a_unit').value));
-            const a_in = (parseFloat(document.getElementById('b_val').value) || 1) * (parseFloat(document.getElementById('b_unit').value));
-            const b = Math.max(a_in, b_in), a = Math.min(a_in, b_in), r = b / a;
-            const alpha = interpolate(r, 'a'), beta = interpolate(r, 'b');
-            IpIt = beta * b * Math.pow(a, 3); Wt = alpha * b * Math.pow(a, 2);
-        } else if (type === 'kor') {
-            const D = (parseFloat(document.getElementById('D').value) || 1) * (parseFloat(document.getElementById('D_unit').value));
-            IpIt = (Math.PI * Math.pow(D, 4)) / 32; Wt = IpIt / (D / 2);
-        } else if (type === 'gyuru') {
-            const D = (parseFloat(document.getElementById('D').value) || 1) * (parseFloat(document.getElementById('D_unit').value));
-            const d = (parseFloat(document.getElementById('d').value) || 0) * (parseFloat(document.getElementById('d_unit').value));
-            IpIt = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32; Wt = IpIt / (D / 2);
-        } else if (type === 'nyitott') {
-            const b = (parseFloat(document.getElementById('a_val').value) || 1) * (parseFloat(document.getElementById('a_unit').value));
-            const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
-            IpIt = (b * Math.pow(t, 3)) / 3; Wt = IpIt / t;
-        } else if (type === 'zart') {
-            const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
-            const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
-            Wt = 2 * Ak * t; IpIt = (4 * Math.pow(Ak, 2) * t) / (4 * Math.sqrt(Ak)); 
-        }
-
-        if (IpIt > 0) {
-            document.getElementById('outTau').innerText = (Mt / Wt / parseFloat(document.getElementById('tau_unit').value)).toFixed(4);
-            document.getElementById('outIt').innerText = (IpIt / parseFloat(document.getElementById('inertia_unit').value)).toLocaleString('hu-HU', {maximumFractionDigits: 2});
-            const thetaRadM = (Mt / (G * IpIt)) * 1000;
-            document.getElementById('outTheta').innerText = document.getElementById('theta_unit').value === 'rad' ? thetaRadM.toFixed(8) + " rad/m" : (thetaRadM * 180 / Math.PI).toFixed(6) + " fok/m";
-            const phiRad = thetaRadM * (L / 1000);
-            document.getElementById('outPhi').innerHTML = document.getElementById('phi_unit_res').value === 'deg' ? (phiRad * 180 / Math.PI).toFixed(4) + " &deg;" : phiRad.toFixed(6) + " rad";
-        }
-    } catch(e) {}
-    drawSchema(document.getElementById('type').value);
-}
 window.onload = updateUI;
 </script>
 </body>
