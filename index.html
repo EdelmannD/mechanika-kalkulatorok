@@ -4,54 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Mechanika - Nyitott szelvény (5 elem)</title>
+    <title>Mechanika - Vékonyfalú Nyitott</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
         body { font-family: 'Inter', sans-serif; }
+        canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #cbd5e1; }
         .math { font-family: 'Libre Baskerville', serif; font-style: italic; }
+        .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
 
 <div class="max-w-7xl mx-auto">
-    <div class="mb-8 border-b border-slate-700 pb-4 text-center md:text-left">
+    <div class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika válogatott fejezetei</h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Vékonyfalú nyitott szelvény – Max. 5 elem kezelése</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Vékonyfalú nyitott szelvény – Eltérő vastagságokkal</p>
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8">
         <div class="lg:col-span-5 space-y-4">
-            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-3">
-                <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-2">
+            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
                     <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Szelvény elemei</h3>
                     <div class="text-[10px] font-black text-indigo-400 uppercase">b [mm] | t [mm]</div>
                 </div>
 
-                <div class="space-y-2" id="element-container">
-                    <script>
-                        for(let i=1; i<=5; i++) {
-                            const valB = i <= 3 ? (i%2==0 ? 120 : 80) : 0; // Alapértékek az első 3-hoz
-                            const valT = i <= 3 ? (i%2==0 ? 6 : 4) : 0;
-                            document.write(`
-                                <div class="flex items-center gap-4">
-                                    <label class="text-sm math w-16 text-slate-400">${i}. elem:</label>
-                                    <input type="number" id="b${i}" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center focus:border-indigo-500 outline-none transition-colors" value="${valB}" oninput="calculate()">
-                                    <input type="number" id="t${i}" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center focus:border-indigo-500 outline-none transition-colors" value="${valT}" oninput="calculate()">
-                                </div>
-                            `);
-                        }
-                    </script>
+                <div class="flex items-center gap-4">
+                    <label class="text-sm math w-16">1. elem:</label>
+                    <input type="number" id="b1" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
+                    <input type="number" id="t1" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="4" oninput="calculate()">
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="text-sm math w-16">2. elem:</label>
+                    <input type="number" id="b2" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="120" oninput="calculate()">
+                    <input type="number" id="t2" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="6" oninput="calculate()">
+                </div>
+                <div class="flex items-center gap-4">
+                    <label class="text-sm math w-16">3. elem:</label>
+                    <input type="number" id="b3" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
+                    <input type="number" id="t3" class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="4" oninput="calculate()">
                 </div>
 
-                <div class="pt-4 flex items-center justify-between border-t border-slate-700 mt-4">
-                    <label class="text-sm math text-indigo-300">&eta; (helyesbítő tényező):</label>
-                    <input type="number" id="eta_val" class="w-24 p-2 bg-slate-900 border border-indigo-500/30 rounded-lg text-center text-indigo-400 font-bold" value="1.15" step="0.01" oninput="calculate()">
+                <div class="pt-2 flex items-center justify-between">
+                    <label class="text-sm math">&eta; (helyesbítő tényező):</label>
+                    <input type="number" id="eta_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1.15" step="0.01" oninput="calculate()">
                 </div>
             </div>
 
             <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700 space-y-3">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Anyag és igénybevétel</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Terhelés és Anyag</h3>
                 <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub> [Nm]:</label>
                     <input type="number" id="Mt" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="250" oninput="calculate()">
                 </div>
@@ -66,34 +68,32 @@
 
         <div class="lg:col-span-7 space-y-6">
             <div class="grid md:grid-cols-2 gap-4">
-                <div class="bg-indigo-600 p-6 rounded-3xl shadow-2xl col-span-2 border-b-4 border-indigo-800">
+                <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl col-span-2">
                     <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (&tau;<sub>max</sub>)</span>
                     <div class="flex items-baseline gap-2">
-                        <h2 id="outTau" class="text-6xl font-900 tracking-tighter text-white">0.00</h2>
-                        <span class="text-indigo-200 font-bold text-xl uppercase tracking-tighter">MPa</span>
+                        <h2 id="outTau" class="text-5xl font-900 tracking-tighter text-white">0.00</h2>
+                        <span class="text-indigo-200 font-bold">MPa</span>
                     </div>
+                    <p class="text-[10px] text-indigo-100 mt-2 italic">*A legnagyobb vastagságú (t_max) elemben mérve.</p>
                 </div>
 
                 <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
                     <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Torziós inercia (I<sub>t</sub>)</span>
-                    <div id="outIt" class="text-3xl font-black text-white">0</div>
+                    <div id="outIt" class="text-2xl font-black text-white">0</div>
                     <span class="text-[9px] text-slate-500 uppercase">mm⁴</span>
                 </div>
 
-                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 group">
+                <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700">
                     <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Teljes elcsavarodás (&phi;)</span>
-                    <div id="outPhi" class="text-3xl font-black text-indigo-400">0.0000</div>
-                    <div class="flex gap-2 mt-2">
-                        <button onclick="setPhiUnit('deg')" id="btnDeg" class="text-[8px] px-3 py-1 rounded-full bg-indigo-500 text-white font-black transition-all">FOK</button>
-                        <button onclick="setPhiUnit('rad')" id="btnRad" class="text-[8px] px-3 py-1 rounded-full bg-slate-700 text-slate-400 font-black transition-all">RAD</button>
+                    <div id="outPhi" class="text-2xl font-black text-indigo-400">0.0000</div>
+                    <div class="flex gap-2 mt-1">
+                        <button onclick="setPhiUnit('deg')" id="btnDeg" class="text-[8px] px-2 py-1 rounded bg-indigo-500 text-white">FOK</button>
+                        <button onclick="setPhiUnit('rad')" id="btnRad" class="text-[8px] px-2 py-1 rounded bg-slate-700 text-slate-300">RAD</button>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-white/5 p-4 rounded-3xl border border-slate-800">
-                <p class="text-[10px] text-slate-500 uppercase mb-4 text-center tracking-widest font-bold">Keresztmetszeti vázlat (jelképes)</p>
-                <canvas id="canvas" width="400" height="200" class="w-full h-auto bg-transparent border-none"></canvas>
-            </div>
+            <canvas id="canvas" width="400" height="250" class="w-full h-auto"></canvas>
         </div>
     </div>
 </div>
@@ -103,33 +103,36 @@ let phiUnit = 'deg';
 
 function setPhiUnit(unit) {
     phiUnit = unit;
-    document.getElementById('btnDeg').className = unit === 'deg' ? 'text-[8px] px-3 py-1 rounded-full bg-indigo-500 text-white font-black' : 'text-[8px] px-3 py-1 rounded-full bg-slate-700 text-slate-400 font-black';
-    document.getElementById('btnRad').className = unit === 'rad' ? 'text-[8px] px-3 py-1 rounded-full bg-indigo-500 text-white font-black' : 'text-[8px] px-3 py-1 rounded-full bg-slate-700 text-slate-400 font-black';
+    document.getElementById('btnDeg').className = unit === 'deg' ? 'text-[8px] px-2 py-1 rounded bg-indigo-500 text-white' : 'text-[8px] px-2 py-1 rounded bg-slate-700 text-slate-300';
+    document.getElementById('btnRad').className = unit === 'rad' ? 'text-[8px] px-2 py-1 rounded bg-indigo-500 text-white' : 'text-[8px] px-2 py-1 rounded bg-slate-700 text-slate-300';
     calculate();
 }
 
 function calculate() {
-    let sumItPart = 0;
-    let maxT = 0;
-
-    for(let i=1; i<=5; i++) {
-        const b = parseFloat(document.getElementById(`b${i}`).value) || 0;
-        const t = parseFloat(document.getElementById(`t${i}`).value) || 0;
-        if (b > 0 && t > 0) {
-            sumItPart += (b * Math.pow(t, 3)) / 3;
-            if (t > maxT) maxT = t;
-        }
-    }
-
+    // Adatok beolvasása
+    const elements = [
+        { b: parseFloat(document.getElementById('b1').value) || 0, t: parseFloat(document.getElementById('t1').value) || 0 },
+        { b: parseFloat(document.getElementById('b2').value) || 0, t: parseFloat(document.getElementById('t2').value) || 0 },
+        { b: parseFloat(document.getElementById('b3').value) || 0, t: parseFloat(document.getElementById('t3').value) || 0 }
+    ];
     const eta = parseFloat(document.getElementById('eta_val').value) || 1;
     const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000; // Nm -> Nmm
     const G = parseFloat(document.getElementById('G_val').value) || 1;
     const L = parseFloat(document.getElementById('L').value) || 0;
 
-    const It = eta * sumItPart;
+    // It = eta * sum(bi * ti^3 / 3)
+    let It = 0;
+    let maxT = 0;
+    elements.forEach(el => {
+        It += (el.b * Math.pow(el.t, 3)) / 3;
+        if (el.t > maxT) maxT = el.t;
+    });
+    It *= eta;
 
     if (It > 0) {
+        // Tau_max = (Mt / It) * t_max
         const tauMax = (Mt / It) * maxT;
+        // Phi = (Mt * L) / (G * It)
         const phiRad = (Mt * L) / (G * It);
 
         document.getElementById('outTau').innerText = tauMax.toFixed(2);
@@ -140,25 +143,20 @@ function calculate() {
         } else {
             document.getElementById('outPhi').innerText = phiRad.toFixed(6) + " rad";
         }
-    } else {
-        document.getElementById('outTau').innerText = "0.00";
-        document.getElementById('outIt').innerText = "0";
-        document.getElementById('outPhi').innerText = "0.0000";
     }
     draw();
 }
 
 function draw() {
     const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, 400, 200);
-    ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    
-    // Egyszerűsített jelképes vázlat (C-profil szerűség)
+    ctx.clearRect(0, 0, 400, 250);
+    ctx.strokeStyle = '#6366f1'; ctx.lineWidth = 3; ctx.setLineDash([]);
+    // Sematikus U-profil rajz
     ctx.beginPath();
-    ctx.moveTo(120, 40); ctx.lineTo(120, 160); // gerinc
-    ctx.lineTo(280, 160); // alsó öv
-    ctx.moveTo(120, 40); ctx.lineTo(280, 40); // felső öv
+    ctx.moveTo(100, 50); ctx.lineTo(100, 200); ctx.lineTo(300, 200); ctx.lineTo(300, 50);
     ctx.stroke();
+    ctx.fillStyle = '#94a3b8'; ctx.font = "10px Inter";
+    ctx.fillText("Sematikus nyitott szelvény vázlat", 120, 30);
 }
 
 window.onload = calculate;
