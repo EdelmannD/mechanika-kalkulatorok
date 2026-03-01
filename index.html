@@ -7,17 +7,12 @@
     <title>Mechanika válogatott fejezetei</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
-        
         body { font-family: 'Inter', sans-serif; }
-        canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #e2e8f0; }
-        
-        /* Matematikai kurzív stílus az előadásdiákhoz hasonlóan */
+        canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #cbd5e1; }
         .math { font-family: 'Libre Baskerville', serif; font-style: italic; text-transform: none !important; }
         .math-normal { font-family: 'Libre Baskerville', serif; font-style: normal; text-transform: none !important; }
-        
         .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; margin-left: 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input { text-transform: none !important; }
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
@@ -25,7 +20,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika válogatott fejezetei</h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Prizmatikus rudak ellenőrzése</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Keresztmetszetek ellenőrzése és feszültségeloszlása</p>
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8">
@@ -42,44 +37,35 @@
             </div>
 
             <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4 border border-slate-700">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Adatok</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai és anyagi adatok</h3>
                 
-                <div id="div-D" class="flex items-center justify-between">
-                    <label class="text-sm math">D:</label>
+                <div id="div-D" class="flex items-center justify-between"><label class="text-sm math">D:</label>
                     <div class="flex items-center"><input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()"><select id="D_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-d" class="hidden flex items-center justify-between">
-                    <label class="text-sm math">d:</label>
+                <div id="div-d" class="hidden flex items-center justify-between"><label class="text-sm math">d:</label>
                     <div class="flex items-center"><input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="d_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-a" class="hidden flex items-center justify-between">
-                    <label class="text-sm math">b:</label>
+                <div id="div-a" class="hidden flex items-center justify-between"><label class="text-sm math">b:</label>
                     <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()"><select id="a_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-b" class="hidden flex items-center justify-between">
-                    <label class="text-sm math">a:</label>
+                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-sm math">a:</label>
                     <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="b_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-t" class="hidden flex items-center justify-between">
-                    <label class="text-sm math">t:</label>
+                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-sm math">t:</label>
                     <div class="flex items-center"><input type="number" id="t_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><select id="t_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-Ak" class="hidden flex items-center justify-between">
-                    <label class="text-sm math">A<sub>k</sub>:</label>
+                <div id="div-Ak" class="hidden flex items-center justify-between"><label class="text-sm math">A<sub>k</sub>:</label>
                     <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-700 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm math">G:</label>
+                    <div class="flex items-center justify-between"><label class="text-sm math">G:</label>
                         <div class="flex items-center"><input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()"><select id="G_unit" onchange="calculate()" class="unit-select"><option value="1">MPa</option><option value="1000">GPa</option></select></div>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm math">M<sub>t</sub>:</label>
+                    <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub>:</label>
                         <div class="flex items-center"><input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()"><select id="Mt_unit" onchange="calculate()" class="unit-select"><option value="1000">Nm</option><option value="1000000">kNm</option></select></div>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <label class="text-sm math">l:</label>
+                    <div class="flex items-center justify-between"><label class="text-sm math">l:</label>
                         <div class="flex items-center"><input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()"><select id="L_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="1000">m</option></select></div>
                     </div>
                 </div>
@@ -89,7 +75,7 @@
         <div class="lg:col-span-8 flex flex-col gap-6">
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Vázlatrajz</span>
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Szelvény vázlat és &tau; eloszlás</span>
                     <canvas id="canvas" width="400" height="400" class="w-full h-auto"></canvas>
                 </div>
                 <div class="space-y-4">
@@ -100,7 +86,6 @@
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
                         </div>
                     </div>
-                    
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Másodrendű nyomaték (<span id="labelInertia" class="math-normal">I<sub>p</sub></span>)</span>
@@ -108,7 +93,6 @@
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
-
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-normal">&vartheta;</span>)</span>
@@ -116,7 +100,6 @@
                         </div>
                         <div id="outTheta" class="text-xl font-black text-indigo-400">0</div>
                     </div>
-
                     <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-normal">&phi;</span>)</span>
@@ -151,20 +134,56 @@ function drawSchema(type) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 400, 400);
-    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "italic 16px Libre Baskerville";
-    const cx = 200; const cy = 200;
+    const cx = 200, cy = 200;
+
+    // Tengelyek
+    ctx.setLineDash([5, 5]); ctx.strokeStyle = '#94a3b8'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(50, cy); ctx.lineTo(350, cy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx, 50); ctx.lineTo(cx, 350); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2.5;
+    ctx.font = "italic 16px Libre Baskerville";
 
     if(type === 'kor' || type === 'gyuru') {
-        ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI*2); ctx.stroke();
-        ctx.fillText("D", cx-5, cy-100);
-        if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 55, 0, Math.PI*2); ctx.stroke(); ctx.fillText("d", cx-5, cy-40); }
-    } else if(type === 'teglalap') {
-        ctx.strokeRect(cx-120, cy-60, 240, 120);
-        ctx.fillText("b", cx-10, cy-75); ctx.fillText("a", cx+130, cy+5);
-    } else if(type === 'nyitott' || type === 'zart') {
-        ctx.strokeRect(cx-80, cy-80, 160, 160);
-        ctx.fillText("t", cx-105, cy+5);
-        if(type === 'zart') ctx.fillText("Ak", cx-15, cy+5);
+        // Szelvény
+        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
+        // Méretvonal D
+        ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(cx-80, cy+100); ctx.lineTo(cx+80, cy+100); ctx.stroke();
+        ctx.fillText("D", cx-5, cy+120);
+        
+        if(type === 'gyuru') {
+            ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
+            ctx.lineWidth = 1; ctx.fillText("d", cx-5, cy+30);
+        }
+
+        // TAU eloszlás (piros)
+        ctx.strokeStyle = '#ef4444'; ctx.beginPath();
+        ctx.moveTo(cx, cy); ctx.lineTo(cx+80, cy-60); ctx.stroke();
+        for(let i=20; i<=80; i+=20) {
+            if(type === 'gyuru' && i < 50) continue;
+            ctx.beginPath(); ctx.moveTo(cx+i, cy); ctx.lineTo(cx+i, cy-(i*0.75)); ctx.stroke();
+        }
+        ctx.fillStyle = '#ef4444'; ctx.fillText("τ", cx+85, cy-65);
+    } 
+    else if(type === 'teglalap') {
+        ctx.strokeRect(cx-100, cy-60, 200, 120);
+        ctx.fillText("b", cx-5, cy-75); ctx.fillText("a", cx+110, cy+5);
+        // TAU eloszlás a hosszabb oldalon
+        ctx.strokeStyle = '#ef4444'; ctx.beginPath();
+        ctx.moveTo(cx+100, cy); ctx.quadraticCurveTo(cx+140, cy, cx+100, cy); // Jelképes parabola
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444'; ctx.fillText("τ max", cx+110, cy-20);
+    }
+    else if(type === 'nyitott' || type === 'zart') {
+        ctx.lineWidth = 4; ctx.strokeRect(cx-70, cy-70, 140, 140);
+        ctx.lineWidth = 1; ctx.fillText("t", cx-90, cy+5);
+        if(type === 'zart') {
+            ctx.fillText("Ak", cx-10, cy+5);
+            // Nyírási áram nyilak
+            ctx.strokeStyle = '#ef4444'; ctx.beginPath(); ctx.moveTo(cx+50, cy-50); ctx.lineTo(cx+50, cy+20); ctx.stroke();
+            ctx.fillText("q", cx+55, cy);
+        }
     }
 }
 
@@ -190,7 +209,9 @@ function calculate() {
             const b = (parseFloat(document.getElementById('a_val').value) || 1) * (parseFloat(document.getElementById('a_unit').value));
             const a = (parseFloat(document.getElementById('b_val').value) || 1) * (parseFloat(document.getElementById('b_unit').value));
             let r = b/a, alpha = 0.208, beta = 0.141;
-            if(r >= 10) { alpha = 0.312; beta = 0.312; } else if(r >= 4) { alpha = 0.282; beta = 0.281; } else if(r >= 2) { alpha = 0.246; beta = 0.229; }
+            if(r >= 10) { alpha = 0.312; beta = 0.312; } 
+            else if(r >= 4) { alpha = 0.282; beta = 0.281; } 
+            else if(r >= 2) { alpha = 0.246; beta = 0.229; }
             IpIt = beta * b * Math.pow(a, 3);
             Wt = alpha * b * Math.pow(a, 2);
         } else if (type === 'nyitott') {
@@ -202,7 +223,7 @@ function calculate() {
             const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
             const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
             Wt = 2 * Ak * t;
-            IpIt = (4 * Math.pow(Ak, 2) * t) / (4 * Math.sqrt(Ak));
+            IpIt = (4 * Math.pow(Ak, 2) * t) / (4 * Math.sqrt(Ak)); 
         }
 
         if (IpIt > 0) {
