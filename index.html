@@ -46,4 +46,160 @@
                     <div class="flex items-center"><input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="d_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
                 <div id="div-a" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">b:</label>
-                    <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-7
+                    <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()"><select id="a_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
+                </div>
+                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">a:</label>
+                    <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="b_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
+                </div>
+                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">t:</label>
+                    <div class="flex items-center"><input type="number" id="t_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><select id="t_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
+                </div>
+                <div id="div-Am" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">Am:</label>
+                    <div class="flex items-center"><input type="number" id="Am_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Am_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-700 space-y-3">
+                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase text-indigo-400">l (rúd hossza):</label>
+                        <div class="flex items-center"><input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-indigo-900 rounded-lg text-center" value="1000" oninput="calculate()"><select id="L_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="1000">m</option></select></div>
+                    </div>
+                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase">Mt:</label>
+                        <div class="flex items-center"><input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center font-bold text-white" value="500" oninput="calculate()"><select id="Mt_unit" onchange="calculate()" class="unit-select"><option value="1000">Nm</option><option value="1000000">kNm</option></select></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="flex flex-col gap-3">
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Szelvény vázlata</span>
+                    <canvas id="canvas" width="400" height="400" class="w-full h-auto shadow-2xl"></canvas>
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl">
+                        <span class="text-[10px] font-black text-indigo-200 uppercase tracking-widest block mb-2">Max. csúsztatófeszültség (τ_max)</span>
+                        <div class="flex justify-between items-baseline"><h2 id="outTau" class="text-5xl font-900 tracking-tighter text-white">-</h2><span class="text-xs font-black">MPa</span></div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <span id="labelInertia" class="text-[9px] font-black text-slate-500 uppercase block mb-1">Inercia</span>
+                        <div id="outIt" class="text-xl font-black text-white">-</div>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Fajlagos elcsavarodás (ϑ)</span>
+                        <div class="grid grid-cols-1 gap-1">
+                            <div id="outThetaRad" class="text-sm font-bold text-indigo-400">- rad/m</div>
+                            <div id="outThetaDeg" class="text-sm font-bold text-indigo-400">- fok/m</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-5 rounded-2xl border border-slate-700 border-l-8 border-indigo-500">
+                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Szögelfordulás (φ) l távolságon</span>
+                        <div id="outPhi" class="text-2xl font-black text-white">- °</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function updateUI() {
+    const type = document.getElementById('type').value;
+    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Am'];
+    groups.forEach(g => document.getElementById(g).classList.add('hidden'));
+
+    if (type === 'kor') document.getElementById('div-D').classList.remove('hidden');
+    if (type === 'gyuru') { document.getElementById('div-D').classList.remove('hidden'); document.getElementById('div-d').classList.remove('hidden'); }
+    if (type === 'teglalap') { document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-b').classList.remove('hidden'); }
+    if (type === 'nyitott') { document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-t').classList.remove('hidden'); }
+    if (type === 'zart') { document.getElementById('div-Am').classList.remove('hidden'); document.getElementById('div-t').classList.remove('hidden'); }
+
+    document.getElementById('labelInertia').innerText = (type === 'kor' || type === 'gyuru') ? "Poláris másodrendű nyomaték (Ip)" : "Torziós másodrendű nyomaték (It)";
+    calculate();
+}
+
+function drawSchema(type) {
+    ctx.clearRect(0, 0, 400, 400);
+    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "bold 14px Inter";
+    const cx = 200; const cy = 200;
+
+    if(type === 'kor' || type === 'gyuru') {
+        ctx.beginPath(); ctx.arc(cx, cy, 90, 0, Math.PI*2); ctx.stroke();
+        ctx.setLineDash([5, 5]); ctx.beginPath(); ctx.moveTo(cx-110, cy); ctx.lineTo(cx+110, cy); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillText("D", cx-5, cy-100);
+        if(type === 'gyuru') {
+            ctx.beginPath(); ctx.arc(cx, cy, 60, 0, Math.PI*2); ctx.stroke();
+            ctx.fillText("d", cx-5, cy-45);
+        }
+    } else if(type === 'teglalap') {
+        ctx.strokeRect(cx-120, cy-60, 240, 120);
+        ctx.fillText("b (hosszabb)", cx-40, cy-75); ctx.fillText("a", cx+130, cy+5);
+    } else if(type === 'nyitott' || type === 'zart') {
+        ctx.strokeRect(cx-80, cy-80, 160, 160);
+        ctx.fillText("t", cx-100, cy);
+        if(type === 'zart') ctx.fillText("Am", cx-15, cy);
+    }
+}
+
+function calculate() {
+    const type = document.getElementById('type').value;
+    const Mt = parseFloat(document.getElementById('Mt').value) * parseFloat(document.getElementById('Mt_unit').value);
+    const l = parseFloat(document.getElementById('L').value) * parseFloat(document.getElementById('L_unit').value);
+    const G = 80000; // Alapértelmezett acél G=80GPa -> 80000 MPa
+
+    let IpIt = 0, Wt = 0;
+
+    if (type === 'kor') {
+        const D = parseFloat(document.getElementById('D').value) * parseFloat(document.getElementById('D_unit').value);
+        IpIt = (Math.PI * Math.pow(D, 4)) / 32;
+        Wt = IpIt / (D / 2);
+    } else if (type === 'gyuru') {
+        const D = parseFloat(document.getElementById('D').value) * parseFloat(document.getElementById('D_unit').value);
+        const d = parseFloat(document.getElementById('d').value) * parseFloat(document.getElementById('d_unit').value);
+        IpIt = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32;
+        Wt = IpIt / (D / 2);
+    } else if (type === 'teglalap') {
+        const b = parseFloat(document.getElementById('a_val').value) * parseFloat(document.getElementById('a_unit').value);
+        const a = parseFloat(document.getElementById('b_val').value) * parseFloat(document.getElementById('b_unit').value);
+        let r = b/a; let alpha = 0.208, beta = 0.141;
+        if(r >= 10) { alpha = 0.312; beta = 0.312; } else if(r >= 4) { alpha = 0.282; beta = 0.281; } else if(r >= 2) { alpha = 0.246; beta = 0.229; }
+        IpIt = beta * b * Math.pow(a, 3);
+        Wt = alpha * b * Math.pow(a, 2);
+    } else if (type === 'nyitott') {
+        const b = parseFloat(document.getElementById('a_val').value) * parseFloat(document.getElementById('a_unit').value);
+        const t = parseFloat(document.getElementById('t_val').value) * parseFloat(document.getElementById('t_unit').value);
+        IpIt = (b * Math.pow(t, 3)) / 3;
+        Wt = IpIt / t;
+    } else if (type === 'zart') {
+        const Am = parseFloat(document.getElementById('Am_val').value) * parseFloat(document.getElementById('Am_unit').value);
+        const t = parseFloat(document.getElementById('t_val').value) * parseFloat(document.getElementById('t_unit').value);
+        Wt = 2 * Am * t;
+        IpIt = (4 * Am * Am * t) / (4 * Math.sqrt(Am)); // Közelítő formula
+    }
+
+    if (IpIt > 0 && Wt > 0) {
+        const tau = Mt / Wt;
+        const thetaRadMM = Mt / (G * IpIt);
+        const thetaRadM = thetaRadMM * 1000;
+        const thetaDegM = thetaRadM * (180 / Math.PI);
+        const phiDeg = thetaDegM * (l / 1000);
+
+        document.getElementById('outTau').innerText = tau.toFixed(2);
+        document.getElementById('outIt').innerText = IpIt.toLocaleString('hu-HU', {maximumFractionDigits: 0}) + " mm⁴";
+        document.getElementById('outThetaRad').innerText = thetaRadM.toFixed(6) + " rad/m";
+        document.getElementById('outThetaDeg').innerText = thetaDegM.toFixed(4) + " fok/m";
+        document.getElementById('outPhi').innerText = phiDeg.toFixed(4) + " °";
+    }
+    drawSchema(type);
+}
+
+window.onload = updateUI;
+</script>
+</body>
+</html>
