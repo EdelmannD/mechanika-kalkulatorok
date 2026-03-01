@@ -12,6 +12,7 @@
         .math { font-family: 'Libre Baskerville', serif; font-style: italic; text-transform: none !important; }
         .math-normal { font-family: 'Libre Baskerville', serif; font-style: normal; text-transform: none !important; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .unit-select { font-size: 0.65rem; background: #1e293b; color: #818cf8; border: 1px solid #334155; border-radius: 4px; padding: 2px; cursor: pointer; outline: none; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
@@ -39,42 +40,45 @@
                 <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai paraméterek</h3>
                 
                 <div id="div-D" class="flex items-center justify-between"><label class="text-sm math">D:</label>
-                    <div class="flex items-center"><input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()"><span class="ml-2 text-xs text-slate-500">mm</span></div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()">
+                        <select id="unit-D" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option></select>
+                    </div>
                 </div>
                 <div id="div-d" class="hidden flex items-center justify-between"><label class="text-sm math">d:</label>
-                    <div class="flex items-center"><input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><span class="ml-2 text-xs text-slate-500">mm</span></div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
+                        <select id="unit-d" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
+                    </div>
                 </div>
                 <div id="div-a" class="hidden flex items-center justify-between"><label class="text-sm math">b:</label>
-                    <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()"><span class="ml-2 text-xs text-slate-500">mm</span></div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
+                        <select id="unit-a" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
+                    </div>
                 </div>
                 <div id="div-b" class="hidden flex items-center justify-between"><label class="text-sm math">a:</label>
-                    <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><span class="ml-2 text-xs text-slate-500">mm</span></div>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
+                        <select id="unit-b" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
+                    </div>
                 </div>
                 
                 <div id="div-zart-options" class="hidden space-y-4">
                     <div class="border-t border-slate-700 pt-2 space-y-3">
                         <div class="flex items-center justify-between">
-                            <label class="text-xs math font-bold text-indigo-400">A<sub>k</sub> (mm²):</label>
-                            <input type="number" id="z_ak_manual" value="4800" class="w-24 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center text-white font-bold" oninput="calculate()">
+                            <label class="text-xs math font-bold text-indigo-400">A<sub>k</sub>:</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="z_ak_manual" value="4800" class="w-20 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center text-white font-bold" oninput="calculate()">
+                                <select id="unit-ak" class="unit-select" onchange="calculate()"><option value="1">mm²</option><option value="100">cm²</option></select>
+                            </div>
                         </div>
-                        <label class="text-[10px] font-black text-slate-500 uppercase block mb-1">Zárt szelvény típusa</label>
+                        <label class="text-[10px] font-black text-slate-500 uppercase block mb-1">Típus</label>
                         <select id="zart_sub_type" onchange="updateZartUI()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-300 outline-none">
                             <option value="polygon">Sokszög</option>
                             <option value="circle">Kör</option>
                         </select>
                     </div>
-
-                    <div id="zart-circle-inputs" class="hidden space-y-2">
-                        <div class="flex items-center justify-between">
-                            <label class="text-xs math">Ívhossz (mm):</label>
-                            <input type="number" id="z_arc" value="200" class="w-20 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
-                        </div>
-                        <div class="flex items-center justify-between">
-                            <label class="text-xs math">Vastagság (mm):</label>
-                            <input type="number" id="z_thick" value="3" class="w-20 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
-                        </div>
-                    </div>
-
                     <div id="zart-polygon-inputs" class="space-y-2">
                         <div class="flex justify-between items-center pt-2">
                             <label class="text-[10px] font-black text-indigo-400 uppercase">Szakaszok száma:</label>
@@ -96,11 +100,17 @@
                     <div class="flex items-center justify-between"><label class="text-sm math">G (MPa):</label>
                         <input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()">
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub> (Nm):</label>
-                        <input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()">
+                    <div class="flex items-center justify-between"><label class="text-sm math">M<sub>t</sub>:</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()">
+                            <select id="unit-mt" class="unit-select" onchange="calculate()"><option value="1000">Nm</option><option value="1">Nmm</option><option value="1000000">kNm</option></select>
+                        </div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-sm math">l (mm):</label>
-                        <input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
+                    <div class="flex items-center justify-between"><label class="text-sm math">l:</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
+                            <select id="unit-l" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option></select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,7 +128,7 @@
                         <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
-                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Torziós tehetetlenségi nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>) [mm⁴]</span>
+                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Tehetetlenségi nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>) [mm⁴]</span>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
@@ -152,6 +162,12 @@ function interpolate(ratio, key) {
     }
 }
 
+function getVal(id, unitId) {
+    const v = parseFloat(document.getElementById(id).value) || 0;
+    const u = parseFloat(document.getElementById(unitId).value) || 1;
+    return v * u;
+}
+
 function generateInputs() {
     const val = document.getElementById('n_elem').value;
     if(!val) return;
@@ -160,11 +176,12 @@ function generateInputs() {
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
         container.innerHTML += `
-            <div class="grid grid-cols-12 gap-2 items-center">
+            <div class="grid grid-cols-12 gap-1 items-center">
                 <span class="col-span-1 text-[10px] font-bold text-slate-500">s${i}</span>
-                <input type="number" id="Li_${i}" value="${i==1?80:40}" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="Li_${i}" value="${i==1?80:40}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <select id="uLi_${i}" class="col-span-2 unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
                 <span class="col-span-1 text-[10px] font-bold text-slate-500 text-right">v${i}</span>
-                <input type="number" id="vi_${i}" value="${i==1?4:2}" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="vi_${i}" value="${i==1?4:2}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -178,11 +195,12 @@ function generateZartInputs() {
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
         container.innerHTML += `
-            <div class="grid grid-cols-12 gap-2 items-center">
+            <div class="grid grid-cols-12 gap-1 items-center">
                 <span class="col-span-1 text-[10px] font-bold text-slate-500">s${i}</span>
-                <input type="number" id="zs_${i}" value="${(i%2==1)?100:60}" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="zs_${i}" value="${(i%2==1)?100:60}" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <select id="uzs_${i}" class="col-span-2 unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
                 <span class="col-span-1 text-[10px] font-bold text-slate-500 text-right">v${i}</span>
-                <input type="number" id="zv_${i}" value="3" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="zv_${i}" value="3" class="col-span-4 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -190,7 +208,6 @@ function generateZartInputs() {
 
 function updateZartUI() {
     const subType = document.getElementById('zart_sub_type').value;
-    document.getElementById('zart-circle-inputs').style.display = (subType === 'circle') ? 'block' : 'none';
     document.getElementById('zart-polygon-inputs').style.display = (subType === 'polygon') ? 'block' : 'none';
     calculate();
 }
@@ -209,31 +226,31 @@ function updateUI() {
 
 function calculate() {
     const type = document.getElementById('type').value;
-    const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000;
-    const L_total = parseFloat(document.getElementById('L').value) || 0;
+    const Mt = getVal('Mt', 'unit-mt');
+    const L_total = getVal('L', 'unit-l');
     const G = parseFloat(document.getElementById('G_val').value) || 80000;
     let It = 0, Wt = 0, Ak = 0;
 
     if (type === 'kor') {
-        const D = parseFloat(document.getElementById('D').value) || 1;
+        const D = getVal('D', 'unit-D');
         It = (Math.PI * Math.pow(D, 4)) / 32; Wt = It / (D / 2);
     } else if (type === 'gyuru') {
-        const D = parseFloat(document.getElementById('D').value) || 1, d = parseFloat(document.getElementById('d').value) || 0;
+        const D = getVal('D', 'unit-D'), d = getVal('d', 'unit-d');
         It = (Math.PI * (Math.pow(D, 4) - Math.pow(d, 4))) / 32; Wt = It / (D / 2);
     } else if (type === 'teglalap') {
-        const b_in = parseFloat(document.getElementById('a_val').value) || 1, a_in = parseFloat(document.getElementById('b_val').value) || 1;
+        const b_in = getVal('a_val', 'unit-a'), a_in = getVal('b_val', 'unit-b');
         const b = Math.max(a_in, b_in), a = Math.min(a_in, b_in), r = b / a;
         It = interpolate(r, 'b') * b * Math.pow(a, 3); Wt = interpolate(r, 'a') * b * Math.pow(a, 2);
     } else if (type === 'nyitott') {
         const n = parseInt(document.getElementById('n_elem').value) || 0;
         let sumIt = 0, maxV = 0;
         for(let i=1; i<=n; i++) {
-            const Li = parseFloat(document.getElementById(`Li_${i}`).value) || 0, vi = parseFloat(document.getElementById(`vi_${i}`).value) || 0;
+            const Li = getVal(`Li_${i}`, `uLi_${i}`), vi = parseFloat(document.getElementById(`vi_${i}`).value) || 0;
             sumIt += (Li * Math.pow(vi, 3)) / 3; if(vi > maxV) maxV = vi;
         }
         It = 1.15 * sumIt; Wt = It / (maxV || 1);
     } else if (type === 'zart') {
-        Ak = parseFloat(document.getElementById('z_ak_manual').value) || 0;
+        Ak = getVal('z_ak_manual', 'unit-ak');
         const subType = document.getElementById('zart_sub_type').value;
         let sum_s_v = 0, min_v = Infinity;
         if(subType === 'circle') {
@@ -242,7 +259,7 @@ function calculate() {
         } else {
             const n = parseInt(document.getElementById('zart_n_elem').value) || 0;
             for(let i=1; i<=n; i++) {
-                const si = parseFloat(document.getElementById(`zs_${i}`).value) || 0, vi = parseFloat(document.getElementById(`zv_${i}`).value) || 1;
+                const si = getVal(`zs_${i}`, `uzs_${i}`), vi = parseFloat(document.getElementById(`zv_${i}`).value) || 1;
                 sum_s_v += si / vi; if(vi < min_v) min_v = vi;
             }
         }
@@ -264,18 +281,13 @@ function drawSchema(type) {
     ctx.clearRect(0, 0, 400, 400); ctx.strokeStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 16px Libre Baskerville";
     const cx = 200, cy = 200;
     if(type === 'kor') { ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); ctx.fillText("D", cx-8, cy-95); }
-    else if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); ctx.fillText("D", cx-8, cy-95); ctx.fillText("d", cx-8, cy+15); }
+    else if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); }
     else if(type === 'teglalap') { ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5); }
     else if(type === 'nyitott') {
-        ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+40); ctx.stroke();
-        ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-80, cy+40); ctx.lineTo(cx+40, cy+40); ctx.stroke();
-        ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx+40, cy+40); ctx.lineTo(cx+40, cy-20); ctx.stroke();
+        ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+40); ctx.lineTo(cx+40, cy+40); ctx.lineTo(cx+40, cy-20); ctx.stroke();
     }
     else if(type === 'zart') {
-        const subType = document.getElementById('zart_sub_type').value;
-        ctx.setLineDash([5, 5]);
-        if(subType === 'circle') { ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI*2); ctx.stroke(); }
-        else { ctx.strokeRect(cx-70, cy-50, 140, 100); }
+        ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-50, 140, 100);
         ctx.setLineDash([]); ctx.fillText("Ak", cx-12, cy+5);
     }
 }
