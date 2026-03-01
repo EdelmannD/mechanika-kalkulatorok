@@ -90,12 +90,21 @@
                             <select id="u-Lrod" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option></select>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="math text-indigo-300">Mₜ:</label>
+                    
+                    <div class="flex items-center justify-between">
+                        <select id="input-mode" class="unit-select text-indigo-300 font-bold" onchange="calculate()">
+                            <option value="mt">Mₜ [nyomaték]</option>
+                            <option value="tau">τₘₐₓ [feszültség]</option>
+                        </select>
                         <div class="flex gap-2 items-center">
-                            <input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()">
-                            <select id="u-Mt" class="unit-select" onchange="calculate()"><option value="1000">Nm</option><option value="1">Nmm</option></select>
+                            <input type="number" id="Mt_or_Tau" class="w-20 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center font-bold text-white" value="500" oninput="calculate()">
+                            <select id="u-Mt-Tau" class="unit-select" onchange="calculate()">
+                                <option value="1000">Nm / MPa</option>
+                                <option value="1">Nmm / Pa</option>
+                            </select>
                         </div>
                     </div>
+
                     <div class="flex items-center justify-between"><label class="math text-indigo-300">G:</label>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
@@ -112,18 +121,25 @@
                     <canvas id="canvas" width="400" height="400" class="w-full h-auto"></canvas>
                 </div>
                 <div class="space-y-4">
-                    <div class="bg-indigo-600 p-5 rounded-3xl shadow-xl border-b-4 border-indigo-800">
+                    <div id="res-tau-box" class="bg-indigo-600 p-5 rounded-3xl shadow-xl border-b-4 border-indigo-800">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-black text-indigo-100 uppercase">Max. feszültség (τₘₐₓ)</span>
-                            <select id="ou-tau" class="unit-select-out" onchange="calculate()"><option value="1">MPa</option><option value="0.1">bar</option><option value="1000000">Pa</option></select>
+                            <span class="text-[10px] font-black text-indigo-100 uppercase" id="outLabel1">Max. feszültség (τₘₐₓ)</span>
+                            <select id="ou-tau" class="unit-select-out" onchange="calculate()"><option value="1">MPa</option><option value="1000000">Pa</option></select>
                         </div>
-                        <h2 id="outTau" class="text-4xl font-900 tracking-tighter">0.0000</h2>
+                        <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
+                    </div>
+
+                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Számított Nyomaték (Mₜ) [Nm]</span>
+                        </div>
+                        <div id="outMtCalc" class="text-xl font-black text-white">0</div>
                     </div>
 
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Inercia (Iₜ / Iₚ)</span>
-                            <select id="ou-it" class="unit-select-out" onchange="calculate()"><option value="1">mm⁴</option><option value="10000">cm⁴</option><option value="1e12">m⁴</option></select>
+                            <select id="ou-it" class="unit-select-out" onchange="calculate()"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black">0</div>
                     </div>
@@ -193,9 +209,13 @@ function updateUI() {
 
 function calculate() {
     const type = document.getElementById('type').value;
-    const Mt = getV('Mt','u-Mt'), G = getV('G_val','u-G'), L_rod = getV('L_rod', 'u-Lrod');
-    let It = 0, Wt = 0;
+    const mode = document.getElementById('input-mode').value;
+    const inputVal = getV('Mt_or_Tau', 'u-Mt-Tau');
+    const G = getV('G_val','u-G'), L_rod = getV('L_rod', 'u-Lrod');
+    
+    let It = 0, Wt = 0, Mt = 0, Tau = 0;
 
+    // Geometria számítása
     if(type==='kor'){ const D=getV('D','u-D'); It=(Math.PI*Math.pow(D,4))/32; Wt=It/(D/2); }
     else if(type==='gyuru'){ const D=getV('D','u-D'), d=getV('d_val','u-d'); It=(Math.PI*(Math.pow(D,4)-Math.pow(d,4)))/32; Wt=It/(D/2); }
     else if(type==='teglalap'){ const b_in=getV('a_val','u-a'), a_in=getV('b_val','u-b'), b=Math.max(a_in,b_in), a=Math.min(a_in,b_in), r=b/a; It=interp(r,'b')*b*Math.pow(a,3); Wt=interp(r,'a')*b*Math.pow(a,2); }
@@ -209,16 +229,28 @@ function calculate() {
         It=(4*Ak*Ak)/sum_lv; Wt=2*Ak*minV;
     }
 
-    // Eredmények
-    const uTau = parseFloat(document.getElementById('ou-tau').value);
-    document.getElementById('outTau').innerText = Wt>0 ? ((Mt/Wt)/uTau).toFixed(4) : "0.0000";
-    document.getElementById('outIt').innerText = (It/parseFloat(document.getElementById('ou-it').value)).toLocaleString('hu-HU');
-    
-    let th = Mt/(G*It), uTh = document.getElementById('ou-th').value;
-    if(uTh==='radm') th*=1000; else if(uTh==='degm') th*=1000*(180/Math.PI);
-    document.getElementById('outTheta').innerText = th.toFixed(8);
+    // Mt és Tau viszonya a mód alapján
+    if (mode === 'mt') {
+        Mt = inputVal;
+        Tau = Wt > 0 ? (Mt / Wt) : 0;
+    } else {
+        Tau = inputVal;
+        Mt = Tau * Wt;
+    }
 
-    let phiRad = (Mt * L_rod) / (G * It);
+    // Kimenetek frissítése
+    const uTauOut = parseFloat(document.getElementById('ou-tau').value);
+    document.getElementById('outTau').innerText = (Tau / uTauOut).toFixed(4);
+    document.getElementById('outMtCalc').innerText = (Mt / 1000).toLocaleString('hu-HU', {maximumFractionDigits: 2}) + " Nm";
+    document.getElementById('outIt').innerText = (It / parseFloat(document.getElementById('ou-it').value)).toLocaleString('hu-HU');
+    
+    let th = It > 0 ? Mt/(G*It) : 0;
+    let uTh = document.getElementById('ou-th').value;
+    let thDisp = th;
+    if(uTh==='radm') thDisp*=1000; else if(uTh==='degm') thDisp*=1000*(180/Math.PI);
+    document.getElementById('outTheta').innerText = thDisp.toFixed(8);
+
+    let phiRad = th * L_rod;
     let uPhi = document.getElementById('ou-phi').value;
     document.getElementById('outPhi').innerText = (uPhi === 'deg' ? (phiRad * 180 / Math.PI) : phiRad).toFixed(6);
 
