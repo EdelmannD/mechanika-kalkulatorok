@@ -141,7 +141,11 @@
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[9px] font-black text-slate-500 uppercase">Inercia (Iₜ / Iₚ)</span>
-                            <select id="ou-it" class="unit-select-out" onchange="calculate()"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
+                            <select id="ou-it" class="unit-select-out" onchange="calculate()">
+                                <option value="1">mm⁴</option>
+                                <option value="10000">cm⁴</option>
+                                <option value="1000000000000">m⁴</option>
+                            </select>
                         </div>
                         <div id="outIt" class="text-xl font-black">0</div>
                     </div>
@@ -177,11 +181,11 @@ function updateInputUnits() {
     const inUnit = document.getElementById('u-in-val');
     const outUnit = document.getElementById('ou-main');
     if (mode === 'mt') {
-        inUnit.innerHTML = '<option value="1000">Nm</option><option value="1">Nmm</option>';
+        inUnit.innerHTML = '<option value="1000000">kNm</option><option value="1000">Nm</option><option value="1">Nmm</option>';
         outUnit.innerHTML = '<option value="1">MPa</option><option value="1000000">Pa</option>';
     } else {
         inUnit.innerHTML = '<option value="1">MPa</option><option value="1000000">Pa</option>';
-        outUnit.innerHTML = '<option value="1000">Nm</option><option value="1">Nmm</option>';
+        outUnit.innerHTML = '<option value="1000000">kNm</option><option value="1000">Nm</option><option value="1">Nmm</option>';
     }
     calculate();
 }
@@ -254,12 +258,14 @@ function calculate() {
     } else {
         Tau = inputVal; Mt = Tau * Wt;
         document.getElementById('main-res-label').innerText = "Számított Nyomaték (Mₜ)";
-        document.getElementById('main-res-val').innerText = (Mt / outUnitMult).toFixed(2);
+        document.getElementById('main-res-val').innerText = (Mt / outUnitMult).toFixed(4);
         document.getElementById('sec-res-label').innerText = "Bevitt Feszültség (τ)";
         document.getElementById('sec-res-val').innerText = Tau.toFixed(2) + " MPa";
     }
 
-    document.getElementById('outIt').innerText = (It / parseFloat(document.getElementById('ou-it').value)).toLocaleString('hu-HU');
+    const itUnit = parseFloat(document.getElementById('ou-it').value);
+    document.getElementById('outIt').innerText = (It / itUnit).toLocaleString('hu-HU', {maximumFractionDigits: (itUnit > 1e11 ? 12 : 2)});
+    
     let th = It > 0 ? Mt/(G*It) : 0;
     let uTh = document.getElementById('ou-th').value;
     let thDisp = th;
