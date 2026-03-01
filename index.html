@@ -6,13 +6,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Mechanika válogatott fejezetei</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+        
         body { font-family: 'Inter', sans-serif; }
         canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #e2e8f0; }
-        /* Mérnöki jelölések stílusa (indexek és görög betűk) */
-        .math-style { font-family: 'Lora', serif; font-style: italic; }
+        
+        /* Matematikai kurzív stílus az előadásdiákhoz hasonlóan */
+        .math { font-family: 'Libre Baskerville', serif; font-style: italic; text-transform: none !important; }
+        .math-normal { font-family: 'Libre Baskerville', serif; font-style: normal; text-transform: none !important; }
+        
         .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; margin-left: 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input { text-transform: none !important; }
     </style>
 </head>
 <body class="bg-slate-900 min-h-screen p-4 md:p-8 text-slate-100">
@@ -37,35 +42,44 @@
             </div>
 
             <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4 border border-slate-700">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai adatok</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Adatok</h3>
                 
-                <div id="div-D" class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">D:</label>
+                <div id="div-D" class="flex items-center justify-between">
+                    <label class="text-sm math">D:</label>
                     <div class="flex items-center"><input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()"><select id="D_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-d" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">d:</label>
+                <div id="div-d" class="hidden flex items-center justify-between">
+                    <label class="text-sm math">d:</label>
                     <div class="flex items-center"><input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="d_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-a" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">b:</label>
+                <div id="div-a" class="hidden flex items-center justify-between">
+                    <label class="text-sm math">b:</label>
                     <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()"><select id="a_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">a:</label>
+                <div id="div-b" class="hidden flex items-center justify-between">
+                    <label class="text-sm math">a:</label>
                     <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="b_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">t:</label>
+                <div id="div-t" class="hidden flex items-center justify-between">
+                    <label class="text-sm math">t:</label>
                     <div class="flex items-center"><input type="number" id="t_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><select id="t_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-Am" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">A<sub>m</sub>:</label>
-                    <div class="flex items-center"><input type="number" id="Am_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Am_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
+                <div id="div-Ak" class="hidden flex items-center justify-between">
+                    <label class="text-sm math">A<sub>k</sub>:</label>
+                    <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-700 space-y-3">
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase text-indigo-300 math-style">G:</label>
-                        <div class="flex items-center"><input type="number" id="G_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center text-indigo-400 font-bold" value="80000" oninput="calculate()"><span class="text-[9px] ml-1 font-bold text-slate-500">MPa</span></div>
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm math">G:</label>
+                        <div class="flex items-center"><input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()"><select id="G_unit" onchange="calculate()" class="unit-select"><option value="1">MPa</option><option value="1000">GPa</option></select></div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">M<sub>t</sub>:</label>
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm math">M<sub>t</sub>:</label>
                         <div class="flex items-center"><input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()"><select id="Mt_unit" onchange="calculate()" class="unit-select"><option value="1000">Nm</option><option value="1000000">kNm</option></select></div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">l:</label>
+                    <div class="flex items-center justify-between">
+                        <label class="text-sm math">l:</label>
                         <div class="flex items-center"><input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()"><select id="L_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="1000">m</option></select></div>
                     </div>
                 </div>
@@ -80,28 +94,24 @@
                 </div>
                 <div class="space-y-4">
                     <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl">
-                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-style">&tau;<sub>max</sub></span>)</span>
+                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-normal">&tau;<sub>max</sub></span>)</span>
                         <div class="flex justify-between items-center">
-                            <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.00</h2>
+                            <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
                         </div>
                     </div>
                     
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span id="labelInertia" class="text-[9px] font-black text-slate-500 uppercase math-style">I<sub>p</sub></span>
-                            <select id="inertia_unit" onchange="calculate()" class="unit-select">
-                                <option value="1">mm⁴</option>
-                                <option value="10000">cm⁴</option>
-                                <option value="1000000000000">m⁴</option>
-                            </select>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Másodrendű nyomaték (<span id="labelInertia" class="math-normal">I<sub>p</sub></span>)</span>
+                            <select id="inertia_unit" onchange="calculate()" class="unit-select"><option value="1">mm⁴</option><option value="10000">cm⁴</option><option value="1000000000000">m⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
 
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-style">&vartheta;</span>)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-normal">&vartheta;</span>)</span>
                             <select id="theta_unit" onchange="calculate()" class="unit-select"><option value="rad">rad/m</option><option value="deg">fok/m</option></select>
                         </div>
                         <div id="outTheta" class="text-xl font-black text-indigo-400">0</div>
@@ -109,7 +119,7 @@
 
                     <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-style">&phi;</span>)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-normal">&phi;</span>)</span>
                             <select id="phi_unit_res" onchange="calculate()" class="unit-select"><option value="deg">&deg;</option><option value="rad">rad</option></select>
                         </div>
                         <div id="outPhi" class="text-2xl font-black text-white">0.0000</div>
@@ -123,14 +133,14 @@
 <script>
 function updateUI() {
     const type = document.getElementById('type').value;
-    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Am'];
+    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak'];
     groups.forEach(g => document.getElementById(g).style.display = 'none');
 
     if (type === 'kor') document.getElementById('div-D').style.display = 'flex';
     if (type === 'gyuru') { document.getElementById('div-D').style.display = 'flex'; document.getElementById('div-d').style.display = 'flex'; }
     if (type === 'teglalap') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-b').style.display = 'flex'; }
     if (type === 'nyitott') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
-    if (type === 'zart') { document.getElementById('div-Am').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
+    if (type === 'zart') { document.getElementById('div-Ak').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
 
     const label = document.getElementById('labelInertia');
     label.innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
@@ -141,7 +151,7 @@ function drawSchema(type) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 400, 400);
-    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "italic bold 16px Lora";
+    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "italic 16px Libre Baskerville";
     const cx = 200; const cy = 200;
 
     if(type === 'kor' || type === 'gyuru') {
@@ -154,7 +164,7 @@ function drawSchema(type) {
     } else if(type === 'nyitott' || type === 'zart') {
         ctx.strokeRect(cx-80, cy-80, 160, 160);
         ctx.fillText("t", cx-105, cy+5);
-        if(type === 'zart') ctx.fillText("Am", cx-15, cy+5);
+        if(type === 'zart') ctx.fillText("Ak", cx-15, cy+5);
     }
 }
 
@@ -163,7 +173,7 @@ function calculate() {
         const type = document.getElementById('type').value;
         const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * (parseFloat(document.getElementById('Mt_unit').value));
         const L = (parseFloat(document.getElementById('L').value) || 0) * (parseFloat(document.getElementById('L_unit').value));
-        const G = parseFloat(document.getElementById('G_val').value) || 80000;
+        const G = (parseFloat(document.getElementById('G_val').value) || 80000) * (parseFloat(document.getElementById('G_unit').value));
 
         let IpIt = 0, Wt = 0;
 
@@ -189,19 +199,18 @@ function calculate() {
             IpIt = (b * Math.pow(t, 3)) / 3;
             Wt = IpIt / t;
         } else if (type === 'zart') {
-            const Am = (parseFloat(document.getElementById('Am_val').value) || 1) * (parseFloat(document.getElementById('Am_unit').value));
+            const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
             const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
-            Wt = 2 * Am * t;
-            IpIt = (4 * Math.pow(Am, 2) * t) / (4 * Math.sqrt(Am));
+            Wt = 2 * Ak * t;
+            IpIt = (4 * Math.pow(Ak, 2) * t) / (4 * Math.sqrt(Ak));
         }
 
         if (IpIt > 0) {
             const tauVal = (Mt / Wt) / parseFloat(document.getElementById('tau_unit').value);
-            document.getElementById('outTau').innerText = tauVal.toFixed(2);
+            document.getElementById('outTau').innerText = tauVal.toFixed(4);
 
             const iUnit = parseFloat(document.getElementById('inertia_unit').value);
             const inerciaVal = IpIt / iUnit;
-            // Ha méter a mértékegység, több tizedes kell
             const decimals = iUnit > 1000000 ? 12 : 2;
             document.getElementById('outIt').innerText = inerciaVal.toLocaleString('hu-HU', {maximumFractionDigits: decimals});
 
