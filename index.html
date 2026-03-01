@@ -92,23 +92,24 @@
                     </div>
                     
                     <div class="flex items-center justify-between">
-                        <select id="input-mode" class="unit-select text-indigo-300 font-bold" onchange="calculate()">
+                        <select id="input-mode" class="unit-select text-indigo-300 font-bold" onchange="updateInputUnits()">
                             <option value="mt">Mₜ [nyomaték]</option>
                             <option value="tau">τₘₐₓ [feszültség]</option>
                         </select>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="Mt_or_Tau" class="w-20 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center font-bold text-white" value="500" oninput="calculate()">
-                            <select id="u-Mt-Tau" class="unit-select" onchange="calculate()">
-                                <option value="1000">Nm / MPa</option>
-                                <option value="1">Nmm / Pa</option>
+                            <select id="u-in-val" class="unit-select" onchange="calculate()">
                             </select>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between"><label class="math text-indigo-300">G:</label>
                         <div class="flex gap-2 items-center">
-                            <input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()">
-                            <select id="u-G" class="unit-select" onchange="calculate()"><option value="1">MPa</option><option value="1000">GPa</option></select>
+                            <input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
+                            <select id="u-G" class="unit-select" onchange="calculate()">
+                                <option value="1000">GPa</option>
+                                <option value="1">MPa</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -123,17 +124,18 @@
                 <div class="space-y-4">
                     <div id="main-res-box" class="bg-indigo-600 p-5 rounded-3xl shadow-xl border-b-4 border-indigo-800">
                         <div class="flex justify-between items-center mb-1">
-                            <span id="main-res-label" class="text-[10px] font-black text-indigo-100 uppercase">Max. feszültség (τₘₐₓ)</span>
-                            <span id="main-res-unit" class="text-[10px] font-bold text-indigo-200">MPa</span>
+                            <span id="main-res-label" class="text-[10px] font-black text-indigo-100 uppercase">Eredmény</span>
+                            <select id="ou-main" class="unit-select-out" onchange="calculate()">
+                            </select>
                         </div>
                         <h2 id="main-res-val" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                     </div>
 
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span id="sec-res-label" class="text-[9px] font-black text-slate-500 uppercase">Számított Nyomaték (Mₜ)</span>
+                            <span id="sec-res-label" class="text-[9px] font-black text-slate-500 uppercase">Bevitt érték</span>
                         </div>
-                        <div id="sec-res-val" class="text-xl font-black text-white">0 Nm</div>
+                        <div id="sec-res-val" class="text-xl font-black text-white">0</div>
                     </div>
 
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
@@ -170,6 +172,20 @@ const SV_TAB = [{r:1,b:0.141,a:0.208},{r:1.5,b:0.196,a:0.231},{r:2,b:0.229,a:0.2
 function interp(r,k){if(r<=SV_TAB[0].r)return SV_TAB[0][k]; if(r>=100)return 0.333; for(let i=0;i<SV_TAB.length-1;i++){let p1=SV_TAB[i],p2=SV_TAB[i+1];if(r>=p1.r&&r<=p2.r)return p1[k]+(r-p1.r)/(p2.r-p1.r)*(p2[k]-p1[k])}}
 function getV(id,uid){return (parseFloat(document.getElementById(id).value)||0)*(parseFloat(document.getElementById(uid).value)||1)}
 
+function updateInputUnits() {
+    const mode = document.getElementById('input-mode').value;
+    const inUnit = document.getElementById('u-in-val');
+    const outUnit = document.getElementById('ou-main');
+    if (mode === 'mt') {
+        inUnit.innerHTML = '<option value="1000">Nm</option><option value="1">Nmm</option>';
+        outUnit.innerHTML = '<option value="1">MPa</option><option value="1000000">Pa</option>';
+    } else {
+        inUnit.innerHTML = '<option value="1">MPa</option><option value="1000000">Pa</option>';
+        outUnit.innerHTML = '<option value="1000">Nm</option><option value="1">Nmm</option>';
+    }
+    calculate();
+}
+
 function generateRows() {
     const n = Math.max(1, Math.min(10, parseInt(document.getElementById('n_elem').value)||3));
     const cont = document.getElementById('dynamic-rows'); cont.innerHTML = '';
@@ -204,15 +220,14 @@ function updateUI() {
     if(t==='teglalap'){ document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-b').classList.remove('hidden'); }
     if(t==='nyitott'){ document.getElementById('div-open-spec').classList.remove('hidden'); if(!document.getElementById('dynamic-rows').innerHTML) generateRows(); }
     if(t==='zart'){ document.getElementById('div-zart-spec').classList.remove('hidden'); if(!document.getElementById('dynamic-zrows').innerHTML) generateZartRows(); }
-    calculate();
+    updateInputUnits();
 }
 
 function calculate() {
     const type = document.getElementById('type').value;
     const mode = document.getElementById('input-mode').value;
-    const inputVal = getV('Mt_or_Tau', 'u-Mt-Tau');
+    const inputVal = getV('Mt_or_Tau', 'u-in-val');
     const G = getV('G_val','u-G'), L_rod = getV('L_rod', 'u-Lrod');
-    
     let It = 0, Wt = 0, Mt = 0, Tau = 0;
 
     if(type==='kor'){ const D=getV('D','u-D'); It=(Math.PI*Math.pow(D,4))/32; Wt=It/(D/2); }
@@ -228,20 +243,20 @@ function calculate() {
         It=(4*Ak*Ak)/sum_lv; Wt=2*Ak*minV;
     }
 
+    const outUnitMult = parseFloat(document.getElementById('ou-main').value) || 1;
+
     if (mode === 'mt') {
         Mt = inputVal; Tau = Wt > 0 ? (Mt / Wt) : 0;
-        document.getElementById('main-res-label').innerText = "Max. feszültség (τₘₐₓ)";
-        document.getElementById('main-res-unit').innerText = "MPa";
-        document.getElementById('main-res-val').innerText = Tau.toFixed(4);
+        document.getElementById('main-res-label').innerText = "Számított feszültség (τₘₐₓ)";
+        document.getElementById('main-res-val').innerText = (Tau / outUnitMult).toFixed(4);
         document.getElementById('sec-res-label').innerText = "Bevitt Nyomaték (Mₜ)";
-        document.getElementById('sec-res-val').innerText = (Mt/1000).toLocaleString('hu-HU') + " Nm";
+        document.getElementById('sec-res-val').innerText = (Mt/1000).toFixed(2) + " Nm";
     } else {
         Tau = inputVal; Mt = Tau * Wt;
         document.getElementById('main-res-label').innerText = "Számított Nyomaték (Mₜ)";
-        document.getElementById('main-res-unit').innerText = "Nm";
-        document.getElementById('main-res-val').innerText = (Mt/1000).toFixed(2);
+        document.getElementById('main-res-val').innerText = (Mt / outUnitMult).toFixed(2);
         document.getElementById('sec-res-label').innerText = "Bevitt Feszültség (τ)";
-        document.getElementById('sec-res-val').innerText = Tau.toLocaleString('hu-HU') + " MPa";
+        document.getElementById('sec-res-val').innerText = Tau.toFixed(2) + " MPa";
     }
 
     document.getElementById('outIt').innerText = (It / parseFloat(document.getElementById('ou-it').value)).toLocaleString('hu-HU');
