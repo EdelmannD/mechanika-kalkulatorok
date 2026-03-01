@@ -64,7 +64,7 @@
                         <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám:</label>
                         <input type="number" id="n_elem" value="3" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateInputs()">
                     </div>
-                    <div id="dynamic-header" class="grid grid-cols-12 gap-2 text-[9px] font-black text-slate-500 uppercase px-1 mb-1">
+                    <div class="grid grid-cols-12 gap-2 text-[9px] font-black text-slate-500 uppercase px-1 mb-1">
                         <div class="col-span-1">#</div>
                         <div class="col-span-6 text-center">Tengelyhossz (L<sub>i</sub>) [mm]</div>
                         <div class="col-span-5 text-center">Vastagság (v<sub>i</sub>) [mm]</div>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="space-y-4">
                     <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl border-b-4 border-indigo-800">
-                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
+                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. feszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
                         <div class="flex justify-between items-center">
                             <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
@@ -111,7 +111,7 @@
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Torziós másodrendű nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Torziós inercia (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
                             <select id="inertia_unit" onchange="calculate()" class="unit-select"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
@@ -161,8 +161,8 @@ function generateInputs() {
         container.innerHTML += `
             <div class="grid grid-cols-12 gap-2 items-center">
                 <span class="col-span-1 text-[10px] font-bold text-slate-500">${i}.</span>
-                <input type="number" id="bn_${i}" value="80" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
-                <input type="number" id="tn_${i}" value="4" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="Li_${i}" value="80" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="vi_${i}" value="4" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -187,7 +187,7 @@ function calculate() {
     try {
         const type = document.getElementById('type').value;
         const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * (parseFloat(document.getElementById('Mt_unit').value));
-        const L = (parseFloat(document.getElementById('L').value) || 0) * (parseFloat(document.getElementById('L_unit').value));
+        const L_total = (parseFloat(document.getElementById('L').value) || 0) * (parseFloat(document.getElementById('L_unit').value));
         const G = (parseFloat(document.getElementById('G_val').value) || 80000) * (parseFloat(document.getElementById('G_unit').value));
         
         let It = 0, Wt = 0, anyWarning = false;
@@ -209,20 +209,17 @@ function calculate() {
             const n = parseInt(document.getElementById('n_elem').value) || 1;
             let sumIt = 0, maxV = 0;
             for(let i=1; i<=n; i++) {
-                const Li = parseFloat(document.getElementById(`bn_${i}`).value) || 0;
-                const vi = parseFloat(document.getElementById(`tn_${i}`).value) || 0;
-                const LIn = document.getElementById(`bn_${i}`), vIn = document.getElementById(`tn_${i}`);
+                const Li = parseFloat(document.getElementById(`Li_${i}`).value) || 0;
+                const vi = parseFloat(document.getElementById(`vi_${i}`).value) || 0;
+                const LIn = document.getElementById(`Li_${i}`), vIn = document.getElementById(`vi_${i}`);
                 if(vi > 0) {
                     if(Li/vi < 5) { anyWarning = true; LIn.classList.add('warning-border'); vIn.classList.add('warning-border'); }
                     else { LIn.classList.remove('warning-border'); vIn.classList.remove('warning-border'); }
-                    // It = eta * sum(Li * vi^3 / 3)
                     sumIt += (Li * Math.pow(vi, 3)) / 3;
                     if(vi > maxV) maxV = vi;
                 }
             }
             It = (parseFloat(document.getElementById('eta_val').value) || 1) * sumIt;
-            // tau_max = Mt / It * v_max
-            // Tehát a Wt technikai értelemben: It / v_max
             Wt = It / (maxV || 1);
         } else if (type === 'zart') {
             const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
@@ -237,7 +234,7 @@ function calculate() {
             document.getElementById('outIt').innerText = (It / parseFloat(document.getElementById('inertia_unit').value)).toLocaleString('hu-HU', {maximumFractionDigits: 2});
             const thetaRadM = (Mt / (G * It)) * 1000;
             document.getElementById('outTheta').innerText = thetaRadM.toFixed(8) + " rad/m";
-            const phiRad = thetaRadM * (L / 1000);
+            const phiRad = thetaRadM * (L_total / 1000);
             document.getElementById('outPhi').innerHTML = document.getElementById('phi_unit_res').value === 'deg' ? (phiRad * 180 / Math.PI).toFixed(4) + " °" : phiRad.toFixed(6) + " rad";
         }
         drawSchema(type);
@@ -249,15 +246,20 @@ function drawSchema(type) {
     ctx.clearRect(0, 0, 400, 400);
     const cx = 200, cy = 200;
     ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 16px Libre Baskerville";
-    if(type === 'kor' || type === 'gyuru') {
+    if(type === 'kor') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); }
         ctx.fillText("D", cx-8, cy-95);
+    } else if(type === 'gyuru') {
+        ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
+        ctx.fillText("D", cx-8, cy-95);
+        ctx.fillText("d", cx-8, cy-30);
     } else if(type === 'teglalap') {
         ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
     } else if(type === 'nyitott') {
         ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
-        ctx.fillText("Li", cx, cy+85); ctx.fillText("vi", cx-115, cy);
+        ctx.fillText("Li", cx, cy+85); 
+        ctx.fillText("vi", cx-115, cy-20);
     } else if(type === 'zart') {
         ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-70, 140, 140); ctx.setLineDash([]);
         ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-90, cy-50);
