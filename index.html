@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Mechanika válogatott fejezetei</title>
+    <title>Mechanika - Interaktív Kalkulátor</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -21,7 +21,7 @@
 <div class="max-w-7xl mx-auto">
     <div class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika válogatott fejezetei</h1>
-        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Összetett Kalkulátor</p>
+        <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás – Interaktív Mérnöki Kalkulátor</p>
     </div>
 
     <div class="grid lg:grid-cols-12 gap-8">
@@ -32,13 +32,13 @@
                     <option value="kor">Kör szelvény</option>
                     <option value="gyuru">Körgyűrű szelvény</option>
                     <option value="teglalap">Téglalap (Saint-Venant)</option>
-                    <option value="nyitott">Vékonyfalú nyitott (Dinamikus)</option>
+                    <option value="nyitott">Vékonyfalú nyitott</option>
                     <option value="zart">Vékonyfalú zárt (Bredt)</option>
                 </select>
             </div>
 
             <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4 border border-slate-700">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Paraméterek</h3>
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai paraméterek</h3>
                 
                 <div id="div-D" class="flex items-center justify-between"><label class="text-sm math">D:</label>
                     <div class="flex items-center"><input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()"><select id="D_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
@@ -59,15 +59,20 @@
                     <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
                 </div>
 
-                <div id="div-dynamic-open" class="hidden space-y-3 pt-2 border-t border-slate-700">
-                    <div class="flex justify-between items-center">
-                        <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám:</label>
-                        <input type="number" id="n_elem" value="3" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center" oninput="generateInputs()">
+                <div id="div-open-inputs" class="hidden space-y-3 pt-2 border-t border-slate-700">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám megadása:</label>
+                        <input type="number" id="n_elem" value="3" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateInputs()">
                     </div>
-                    <div id="dynamic-rows" class="space-y-2 max-h-48 overflow-y-auto pr-2"></div>
-                    <div class="flex justify-between items-center pt-2">
-                        <label class="text-[10px] math text-indigo-300">η korrekció:</label>
-                        <input type="number" id="eta_val" value="1.15" step="0.05" class="w-16 bg-slate-900 border border-slate-700 rounded text-center" oninput="calculate()">
+                    <div id="dynamic-header" class="grid grid-cols-12 gap-2 text-[9px] font-black text-slate-500 uppercase px-1 mb-1">
+                        <div class="col-span-1">#</div>
+                        <div class="col-span-6 text-center">Tengelyhossz (b) [mm]</div>
+                        <div class="col-span-5 text-center">Vastagság (t) [mm]</div>
+                    </div>
+                    <div id="dynamic-rows" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+                    <div class="flex justify-between items-center pt-3 border-t border-slate-700/50">
+                        <label class="text-[10px] math text-indigo-300">η (helyesbítő tényező):</label>
+                        <input type="number" id="eta_val" value="1.15" step="0.01" class="w-16 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
                     </div>
                 </div>
 
@@ -86,19 +91,19 @@
         </div>
 
         <div class="lg:col-span-8 flex flex-col gap-6">
-            <div id="warning-box" class="hidden bg-red-900/40 border border-red-500 p-3 rounded-xl flex items-center gap-3 animate-pulse">
+            <div id="warning-box" class="hidden bg-red-900/40 border border-red-500 p-3 rounded-xl flex items-center gap-3">
                 <span class="text-xl">⚠️</span>
-                <p class="text-[10px] font-black uppercase">Vékonyfalú feltétel (b/t ≥ 5) nem teljesül!</p>
+                <p class="text-[10px] font-black uppercase tracking-tight text-red-200">Geometriai korlát: a vékonyfalú feltétel (b/t ≥ 5) nem teljesül minden elemnél!</p>
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Jelölési vázlat</span>
+                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Sematikus ábra</span>
                     <canvas id="canvas" width="400" height="400" class="w-full h-auto"></canvas>
                 </div>
                 <div class="space-y-4">
-                    <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl">
-                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. feszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
+                    <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl border-b-4 border-indigo-800">
+                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-normal">τ<sub>max</sub></span>)</span>
                         <div class="flex justify-between items-center">
                             <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.0000</h2>
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
@@ -106,7 +111,7 @@
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Torziós inercia (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Torziós másodrendű nyomaték (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
                             <select id="inertia_unit" onchange="calculate()" class="unit-select"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
@@ -149,15 +154,15 @@ function interpolate(ratio, key) {
 }
 
 function generateInputs() {
-    const n = Math.max(1, parseInt(document.getElementById('n_elem').value) || 1);
+    const n = Math.max(1, Math.min(10, parseInt(document.getElementById('n_elem').value) || 1));
     const container = document.getElementById('dynamic-rows');
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
         container.innerHTML += `
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] w-4 font-bold text-slate-500">${i}.</span>
-                <input type="number" id="bn_${i}" value="80" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
-                <input type="number" id="tn_${i}" value="4" class="flex-1 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs" oninput="calculate()">
+            <div class="grid grid-cols-12 gap-2 items-center">
+                <span class="col-span-1 text-[10px] font-bold text-slate-500">${i}.</span>
+                <input type="number" id="bn_${i}" value="80" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="tn_${i}" value="4" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -165,13 +170,13 @@ function generateInputs() {
 
 function updateUI() {
     const type = document.getElementById('type').value;
-    const ids = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak', 'div-dynamic-open'];
-    ids.forEach(id => document.getElementById(id).style.display = 'none');
+    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak', 'div-open-inputs'];
+    groups.forEach(g => document.getElementById(g).style.display = 'none');
 
     if (type === 'kor') document.getElementById('div-D').style.display = 'flex';
     if (type === 'gyuru') { document.getElementById('div-D').style.display = 'flex'; document.getElementById('div-d').style.display = 'flex'; }
     if (type === 'teglalap') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-b').style.display = 'flex'; }
-    if (type === 'nyitott') document.getElementById('div-dynamic-open').style.display = 'block';
+    if (type === 'nyitott') document.getElementById('div-open-inputs').style.display = 'block';
     if (type === 'zart') { document.getElementById('div-Ak').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
     
     document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
@@ -210,6 +215,7 @@ function calculate() {
                 if(tn > 0) {
                     if(bn/tn < 5) { anyWarning = true; bIn.classList.add('warning-border'); tIn.classList.add('warning-border'); }
                     else { bIn.classList.remove('warning-border'); tIn.classList.remove('warning-border'); }
+                    // It = sum(b * t^3 / 3)
                     sumIt += (bn * Math.pow(tn, 3)) / 3;
                     if(tn > maxT) maxT = tn;
                 }
@@ -240,7 +246,7 @@ function drawSchema(type) {
     const canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 400, 400);
     const cx = 200, cy = 200;
-    ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 18px Libre Baskerville";
+    ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 16px Libre Baskerville";
     if(type === 'kor' || type === 'gyuru') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
         if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke(); }
@@ -248,8 +254,8 @@ function drawSchema(type) {
     } else if(type === 'teglalap') {
         ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
     } else if(type === 'nyitott') {
-        ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
-        ctx.fillText("b", cx, cy+85); ctx.fillText("t", cx-110, cy);
+        ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
+        ctx.fillText("bi", cx, cy+85); ctx.fillText("ti", cx-115, cy);
     } else if(type === 'zart') {
         ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-70, 140, 140); ctx.setLineDash([]);
         ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-90, cy-50);
