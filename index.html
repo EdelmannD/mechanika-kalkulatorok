@@ -11,7 +11,6 @@
         canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #cbd5e1; }
         .math { font-family: 'Libre Baskerville', serif; font-style: italic; text-transform: none !important; }
         .math-normal { font-family: 'Libre Baskerville', serif; font-style: normal; text-transform: none !important; }
-        .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; margin-left: 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
 </head>
@@ -53,8 +52,12 @@
                 </div>
                 
                 <div id="div-zart-options" class="hidden space-y-4">
-                    <div class="border-t border-slate-700 pt-2">
-                        <label class="text-[10px] font-black text-slate-500 uppercase block mb-2">Zárt szelvény típusa</label>
+                    <div class="border-t border-slate-700 pt-2 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs math font-bold text-indigo-400">A<sub>k</sub> (mm²):</label>
+                            <input type="number" id="z_ak_manual" value="4800" class="w-24 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center text-white font-bold" oninput="calculate()">
+                        </div>
+                        <label class="text-[10px] font-black text-slate-500 uppercase block mb-1">Zárt szelvény típusa</label>
                         <select id="zart_sub_type" onchange="updateZartUI()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-300 outline-none">
                             <option value="polygon">Sokszög</option>
                             <option value="circle">Kör</option>
@@ -74,8 +77,8 @@
 
                     <div id="zart-polygon-inputs" class="space-y-2">
                         <div class="flex justify-between items-center pt-2">
-                            <label class="text-[10px] font-black text-indigo-400 uppercase">Szakaszok (s<sub>i</sub>, v<sub>i</sub>) mm:</label>
-                            <input type="number" id="zart_n_elem" value="4" min="3" max="8" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateZartInputs()">
+                            <label class="text-[10px] font-black text-indigo-400 uppercase">Szakaszok száma:</label>
+                            <input type="number" id="zart_n_elem" value="" placeholder="?" min="3" max="8" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateZartInputs()">
                         </div>
                         <div id="dynamic-zart-rows" class="space-y-2"></div>
                     </div>
@@ -84,10 +87,9 @@
                 <div id="div-open-inputs" class="hidden space-y-3 pt-2 border-t border-slate-700">
                     <div class="flex justify-between items-center mb-2">
                         <label class="text-[10px] font-black text-indigo-400 uppercase">Elemszám:</label>
-                        <input type="number" id="n_elem" value="3" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateInputs()">
+                        <input type="number" id="n_elem" value="" placeholder="?" min="1" max="10" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateInputs()">
                     </div>
                     <div id="dynamic-rows" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
-                    <input type="hidden" id="eta_val" value="1.15">
                 </div>
 
                 <div class="pt-4 border-t border-slate-700 space-y-3">
@@ -146,14 +148,14 @@ function interpolate(ratio, key) {
     if (ratio >= SV_TABLE[SV_TABLE.length - 1].r) return SV_TABLE[SV_TABLE.length - 1][key];
     for (let i = 0; i < SV_TABLE.length - 1; i++) {
         const p1 = SV_TABLE[i], p2 = SV_TABLE[i+1];
-        if (ratio >= p1.r && ratio <= p2.r) {
-            return p1[key] + (ratio - p1.r) / (p2.r - p1.r) * (p2[key] - p1[key]);
-        }
+        if (ratio >= p1.r && ratio <= p2.r) return p1[key] + (ratio - p1.r) / (p2.r - p1.r) * (p2[key] - p1[key]);
     }
 }
 
 function generateInputs() {
-    const n = Math.max(1, Math.min(10, parseInt(document.getElementById('n_elem').value) || 1));
+    const val = document.getElementById('n_elem').value;
+    if(!val) return;
+    const n = Math.max(1, Math.min(10, parseInt(val)));
     const container = document.getElementById('dynamic-rows');
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
@@ -169,7 +171,9 @@ function generateInputs() {
 }
 
 function generateZartInputs() {
-    const n = Math.max(3, Math.min(8, parseInt(document.getElementById('zart_n_elem').value) || 4));
+    const val = document.getElementById('zart_n_elem').value;
+    if(!val) return;
+    const n = Math.max(3, Math.min(8, parseInt(val)));
     const container = document.getElementById('dynamic-zart-rows');
     container.innerHTML = '';
     for(let i=1; i<=n; i++) {
@@ -200,14 +204,12 @@ function updateUI() {
     if (type === 'nyitott') document.getElementById('div-open-inputs').style.display = 'block';
     if (type === 'zart') { document.getElementById('div-zart-options').style.display = 'block'; updateZartUI(); }
     document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
-    if(type === 'nyitott' && !document.getElementById('dynamic-rows').innerHTML) generateInputs();
-    if(type === 'zart' && !document.getElementById('dynamic-zart-rows').innerHTML) generateZartInputs();
     calculate();
 }
 
 function calculate() {
     const type = document.getElementById('type').value;
-    const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000; // Nm -> Nmm
+    const Mt = (parseFloat(document.getElementById('Mt').value) || 0) * 1000;
     const L_total = parseFloat(document.getElementById('L').value) || 0;
     const G = parseFloat(document.getElementById('G_val').value) || 80000;
     let It = 0, Wt = 0, Ak = 0;
@@ -223,7 +225,7 @@ function calculate() {
         const b = Math.max(a_in, b_in), a = Math.min(a_in, b_in), r = b / a;
         It = interpolate(r, 'b') * b * Math.pow(a, 3); Wt = interpolate(r, 'a') * b * Math.pow(a, 2);
     } else if (type === 'nyitott') {
-        const n = parseInt(document.getElementById('n_elem').value) || 1;
+        const n = parseInt(document.getElementById('n_elem').value) || 0;
         let sumIt = 0, maxV = 0;
         for(let i=1; i<=n; i++) {
             const Li = parseFloat(document.getElementById(`Li_${i}`).value) || 0, vi = parseFloat(document.getElementById(`vi_${i}`).value) || 0;
@@ -231,27 +233,25 @@ function calculate() {
         }
         It = 1.15 * sumIt; Wt = It / (maxV || 1);
     } else if (type === 'zart') {
+        Ak = parseFloat(document.getElementById('z_ak_manual').value) || 0;
         const subType = document.getElementById('zart_sub_type').value;
         let sum_s_v = 0, min_v = Infinity;
         if(subType === 'circle') {
             const s = parseFloat(document.getElementById('z_arc').value) || 1, v = parseFloat(document.getElementById('z_thick').value) || 1;
-            Ak = Math.pow(s, 2) / (4 * Math.PI); sum_s_v = s / v; min_v = v;
+            sum_s_v = s / v; min_v = v;
         } else {
-            const n = parseInt(document.getElementById('zart_n_elem').value) || 4;
-            let total_s = 0;
+            const n = parseInt(document.getElementById('zart_n_elem').value) || 0;
             for(let i=1; i<=n; i++) {
                 const si = parseFloat(document.getElementById(`zs_${i}`).value) || 0, vi = parseFloat(document.getElementById(`zv_${i}`).value) || 1;
-                sum_s_v += si / vi; if(vi < min_v) min_v = vi; total_s += si;
+                sum_s_v += si / vi; if(vi < min_v) min_v = vi;
             }
-            if(n === 4) Ak = (parseFloat(document.getElementById('zs_1').value)||0) * (parseFloat(document.getElementById('zs_2').value)||0);
-            else Ak = (Math.pow(total_s, 2) * n) / (4 * Math.PI * Math.tan(Math.PI/n)) * 0.15; // Közelítés
         }
         It = (4 * Ak * Ak) / (sum_s_v || 1); Wt = 2 * Ak * min_v;
     }
 
     document.getElementById('outAk').innerText = Ak ? Ak.toFixed(1) : "-";
     if (It > 0) {
-        document.getElementById('outTau').innerText = (Mt / Wt).toFixed(4);
+        document.getElementById('outTau').innerText = (Wt > 0) ? (Mt / Wt).toFixed(4) : "0.0000";
         document.getElementById('outIt').innerText = It.toLocaleString('hu-HU', {maximumFractionDigits: 0});
         const phiRad = (Mt * L_total) / (G * It);
         document.getElementById('outPhi').innerText = (phiRad * 180 / Math.PI).toFixed(4);
@@ -270,13 +270,12 @@ function drawSchema(type) {
         ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+40); ctx.stroke();
         ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-80, cy+40); ctx.lineTo(cx+40, cy+40); ctx.stroke();
         ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx+40, cy+40); ctx.lineTo(cx+40, cy-20); ctx.stroke();
-        ctx.font = "12px Inter"; ctx.fillText("L1,v1", cx-120, cy-10); ctx.fillText("L2,v2", cx-30, cy+60); ctx.fillText("L3,v3", cx+50, cy+10);
     }
     else if(type === 'zart') {
         const subType = document.getElementById('zart_sub_type').value;
         ctx.setLineDash([5, 5]);
-        if(subType === 'circle') { ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI*2); ctx.stroke(); ctx.fillText("s", cx+75, cy); }
-        else { ctx.strokeRect(cx-70, cy-50, 140, 100); ctx.fillText("s1", cx-10, cy-60); ctx.fillText("s2", cx+80, cy+5); }
+        if(subType === 'circle') { ctx.beginPath(); ctx.arc(cx, cy, 70, 0, Math.PI*2); ctx.stroke(); }
+        else { ctx.strokeRect(cx-70, cy-50, 140, 100); }
         ctx.setLineDash([]); ctx.fillText("Ak", cx-12, cy+5);
     }
 }
