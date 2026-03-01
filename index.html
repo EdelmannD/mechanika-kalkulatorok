@@ -79,7 +79,6 @@
                             <input type="number" id="zart_n_elem" value="2" min="1" max="5" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateZartInputs()">
                         </div>
                         <div id="dynamic-zart-rows" class="space-y-2"></div>
-                        <p class="text-[8px] text-slate-500 italic">*Sokszögnél az Ak-t az első két szakasz szorzataként számoljuk (téglalap modell).</p>
                     </div>
                 </div>
 
@@ -199,8 +198,8 @@ function generateZartInputs() {
         container.innerHTML += `
             <div class="grid grid-cols-12 gap-2 items-center">
                 <span class="col-span-1 text-[10px] font-bold text-slate-500">${i}.</span>
-                <input type="number" id="zs_${i}" value="${i==1?120:80}" placeholder="s (mm)" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
-                <input type="number" id="zv_${i}" value="${i==1?4:6}" placeholder="v (mm)" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="zs_${i}" value="${i==1?120:80}" placeholder="s" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="zv_${i}" value="${i==1?4:6}" placeholder="v" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -285,14 +284,13 @@ function calculate() {
             } else {
                 const n = parseInt(document.getElementById('zart_n_elem').value) || 1;
                 let s1 = parseFloat(document.getElementById('zs_1')?.value) || 0;
-                let s2 = parseFloat(document.getElementById('zs_2')?.value) || s1;
+                let s2 = (n >= 2) ? (parseFloat(document.getElementById('zs_2')?.value) || 0) : s1;
                 Ak_calc = s1 * s2;
                 
                 for(let i=1; i<=n; i++) {
                     const si = parseFloat(document.getElementById(`zs_${i}`).value) || 0;
                     const vi = parseFloat(document.getElementById(`zv_${i}`).value) || 1;
-                    // Bredt sum Si/Vi for full loop:
-                    sum_s_v += (i <= 2) ? (2 * si / vi) : 0; // Egyszerűsített téglalap modell (2*s1+2*s2)
+                    sum_s_v += (i <= 2) ? (2 * si / vi) : 0; 
                     if(vi < min_v) min_v = vi;
                 }
             }
@@ -323,17 +321,31 @@ function drawSchema(type) {
     
     if(type === 'kor') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
+        ctx.fillText("D", cx-8, cy-95);
     } else if(type === 'gyuru') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
         ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
+        ctx.fillText("D", cx-8, cy-95);
+        ctx.fillText("d", cx-8, cy+15);
     } else if(type === 'teglalap') {
         ctx.strokeRect(cx-100, cy-50, 200, 100); 
+        ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
     } else if(type === 'nyitott') {
         ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-60, cy-100); ctx.lineTo(cx-60, cy); ctx.stroke();
         ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-60, cy); ctx.lineTo(cx+40, cy); ctx.stroke();
+        ctx.font = "italic 13px Libre Baskerville";
+        ctx.fillText("L1, v1", cx-105, cy-50); ctx.fillText("L2, v2", cx-15, cy-10);
     } else if(type === 'zart') {
-        ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-50, 140, 100); ctx.setLineDash([]);
-        ctx.fillText("Ak", cx-12, cy+5); 
+        const subType = document.getElementById('zart_sub_type').value;
+        if(subType === 'circle') {
+            ctx.beginPath(); ctx.setLineDash([5, 5]); ctx.arc(cx, cy, 70, 0, Math.PI*2); ctx.stroke(); ctx.setLineDash([]);
+            ctx.fillText("Ak", cx-12, cy+5);
+        } else {
+            ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-50, 140, 100); ctx.setLineDash([]);
+            ctx.fillText("Ak", cx-12, cy+5); 
+            ctx.font = "italic 12px Libre Baskerville";
+            ctx.fillText("s1", cx-5, cy-60); ctx.fillText("s2", cx+80, cy+5);
+        }
     }
 }
 
