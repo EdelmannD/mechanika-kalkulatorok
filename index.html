@@ -52,11 +52,35 @@
                 <div id="div-b" class="hidden flex items-center justify-between"><label class="text-sm math">a:</label>
                     <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="b_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-sm math">t:</label>
-                    <div class="flex items-center"><input type="number" id="t_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><select id="t_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
-                </div>
-                <div id="div-Ak" class="hidden flex items-center justify-between"><label class="text-sm math">A<sub>k</sub>:</label>
-                    <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
+                
+                <div id="div-zart-options" class="hidden space-y-3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Zárt típus</label>
+                    <select id="zart_sub_type" onchange="updateUI()" class="w-full p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs font-bold text-indigo-300 outline-none">
+                        <option value="zart_kor">Kör (állandó v)</option>
+                        <option value="zart_poly">Sokszög (szakaszos)</option>
+                    </select>
+                    
+                    <div id="div-Ak" class="flex items-center justify-between"><label class="text-sm math">A<sub>k</sub>:</label>
+                        <div class="flex items-center"><input type="number" id="Ak_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Ak_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
+                    </div>
+                    
+                    <div id="div-zart-v-single" class="flex items-center justify-between">
+                        <label class="text-sm math">v:</label>
+                        <div class="flex items-center"><input type="number" id="zart_v" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><span class="ml-2 text-[10px] font-bold">mm</span></div>
+                    </div>
+
+                    <div id="div-zart-poly-rows" class="hidden space-y-2 pt-2 border-t border-slate-700">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="text-[10px] font-black text-indigo-400 uppercase">Szakaszok (max 5):</label>
+                            <input type="number" id="zart_n_elem" value="4" min="1" max="5" class="w-12 bg-slate-900 border border-indigo-500 rounded text-center font-bold" oninput="generateZartInputs()">
+                        </div>
+                        <div class="grid grid-cols-12 gap-2 text-[8px] font-black text-slate-500 uppercase px-1">
+                            <div class="col-span-1">#</div>
+                            <div class="col-span-6 text-center">Tengelyhossz (s<sub>i</sub>)</div>
+                            <div class="col-span-5 text-center">Vastagság (v<sub>i</sub>)</div>
+                        </div>
+                        <div id="dynamic-zart-rows" class="space-y-1"></div>
+                    </div>
                 </div>
 
                 <div id="div-open-inputs" class="hidden space-y-3 pt-2 border-t border-slate-700">
@@ -168,19 +192,48 @@ function generateInputs() {
     calculate();
 }
 
+function generateZartInputs() {
+    const n = Math.max(1, Math.min(5, parseInt(document.getElementById('zart_n_elem').value) || 1));
+    const container = document.getElementById('dynamic-zart-rows');
+    container.innerHTML = '';
+    for(let i=1; i<=n; i++) {
+        container.innerHTML += `
+            <div class="grid grid-cols-12 gap-2 items-center">
+                <span class="col-span-1 text-[10px] font-bold text-slate-500">${i}.</span>
+                <input type="number" id="zs_${i}" value="100" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="zv_${i}" value="4" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+            </div>`;
+    }
+    calculate();
+}
+
 function updateUI() {
     const type = document.getElementById('type').value;
-    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-t', 'div-Ak', 'div-open-inputs'];
+    const zartSubType = document.getElementById('zart_sub_type').value;
+    
+    const groups = ['div-D', 'div-d', 'div-a', 'div-b', 'div-zart-options', 'div-open-inputs'];
     groups.forEach(g => document.getElementById(g).style.display = 'none');
 
     if (type === 'kor') document.getElementById('div-D').style.display = 'flex';
     if (type === 'gyuru') { document.getElementById('div-D').style.display = 'flex'; document.getElementById('div-d').style.display = 'flex'; }
     if (type === 'teglalap') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-b').style.display = 'flex'; }
     if (type === 'nyitott') document.getElementById('div-open-inputs').style.display = 'block';
-    if (type === 'zart') { document.getElementById('div-Ak').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
+    
+    if (type === 'zart') {
+        document.getElementById('div-zart-options').style.display = 'block';
+        if (zartSubType === 'zart_kor') {
+            document.getElementById('div-zart-v-single').style.display = 'flex';
+            document.getElementById('div-zart-poly-rows').style.display = 'none';
+        } else {
+            document.getElementById('div-zart-v-single').style.display = 'none';
+            document.getElementById('div-zart-poly-rows').style.display = 'block';
+            if (!document.getElementById('dynamic-zart-rows').innerHTML) generateZartInputs();
+        }
+    }
     
     document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
-    if(type === 'nyitott') generateInputs(); else calculate();
+    if(type === 'nyitott' && !document.getElementById('dynamic-rows').innerHTML) generateInputs();
+    calculate();
 }
 
 function calculate() {
@@ -211,10 +264,8 @@ function calculate() {
             for(let i=1; i<=n; i++) {
                 const Li = parseFloat(document.getElementById(`Li_${i}`).value) || 0;
                 const vi = parseFloat(document.getElementById(`vi_${i}`).value) || 0;
-                const LIn = document.getElementById(`Li_${i}`), vIn = document.getElementById(`vi_${i}`);
                 if(vi > 0) {
-                    if(Li/vi < 5) { anyWarning = true; LIn.classList.add('warning-border'); vIn.classList.add('warning-border'); }
-                    else { LIn.classList.remove('warning-border'); vIn.classList.remove('warning-border'); }
+                    if(Li/vi < 5) anyWarning = true;
                     sumIt += (Li * Math.pow(vi, 3)) / 3;
                     if(vi > maxV) maxV = vi;
                 }
@@ -223,8 +274,26 @@ function calculate() {
             Wt = It / (maxV || 1);
         } else if (type === 'zart') {
             const Ak = (parseFloat(document.getElementById('Ak_val').value) || 1) * (parseFloat(document.getElementById('Ak_unit').value));
-            const t = (parseFloat(document.getElementById('t_val').value) || 1) * (parseFloat(document.getElementById('t_unit').value));
-            Wt = 2 * Ak * t; It = (4 * Ak * Ak * t) / (4 * Math.sqrt(Ak)); 
+            const zartSubType = document.getElementById('zart_sub_type').value;
+            
+            if (zartSubType === 'zart_kor') {
+                const v = parseFloat(document.getElementById('zart_v').value) || 1;
+                const sk = 2 * Math.sqrt(Math.PI * Ak); // Kerület közelítése Ak-ból
+                Wt = 2 * Ak * v;
+                It = (4 * Ak * Ak) / (sk / v);
+            } else {
+                const n = parseInt(document.getElementById('zart_n_elem').value) || 1;
+                let sum_s_v = 0;
+                let min_v = Infinity;
+                for(let i=1; i<=n; i++) {
+                    const si = parseFloat(document.getElementById(`zs_${i}`).value) || 0;
+                    const vi = parseFloat(document.getElementById(`zv_${i}`).value) || 1;
+                    sum_s_v += si / vi;
+                    if (vi < min_v) min_v = vi;
+                }
+                It = (4 * Ak * Ak) / sum_s_v;
+                Wt = 2 * Ak * min_v; // A legvékonyabb helyen ébred a max feszültség
+            }
         }
 
         document.getElementById('warning-box').style.display = anyWarning ? 'flex' : 'none';
@@ -238,7 +307,7 @@ function calculate() {
             document.getElementById('outPhi').innerHTML = document.getElementById('phi_unit_res').value === 'deg' ? (phiRad * 180 / Math.PI).toFixed(4) + " °" : phiRad.toFixed(6) + " rad";
         }
         drawSchema(type);
-    } catch(e) {}
+    } catch(e) { console.error(e); }
 }
 
 function drawSchema(type) {
@@ -249,29 +318,16 @@ function drawSchema(type) {
     
     if(type === 'kor') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
-        ctx.fillText("D", cx-8, cy-95);
     } else if(type === 'gyuru') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
         ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
-        ctx.fillText("D", cx-8, cy-95);
-        ctx.fillText("d", cx-8, cy+15);
     } else if(type === 'teglalap') {
-        ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
+        ctx.strokeRect(cx-100, cy-50, 200, 100);
     } else if(type === 'nyitott') {
-        // 1. szakasz (függőleges felső)
-        ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-60, cy-100); ctx.lineTo(cx-60, cy); ctx.stroke();
-        // 2. szakasz (vízszintes közép)
-        ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-60, cy); ctx.lineTo(cx+40, cy); ctx.stroke();
-        // 3. szakasz (függőleges alsó)
-        ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx+40, cy); ctx.lineTo(cx+40, cy+80); ctx.stroke();
-        
-        ctx.font = "italic 13px Libre Baskerville";
-        ctx.fillText("L1, v1", cx-105, cy-50);
-        ctx.fillText("L2, v2", cx-15, cy-10);
-        ctx.fillText("L3, v3", cx+50, cy+45);
+        ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx-60, cy-60); ctx.lineTo(cx-60, cy+60); ctx.lineTo(cx+60, cy+60); ctx.stroke();
     } else if(type === 'zart') {
         ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-70, 140, 140); ctx.setLineDash([]);
-        ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-90, cy-50);
+        ctx.fillText("Ak", cx-12, cy+5);
     }
 }
 
