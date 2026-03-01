@@ -6,9 +6,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Mechanika válogatott fejezetei</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
         body { font-family: 'Inter', sans-serif; }
         canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #e2e8f0; }
+        /* Mérnöki jelölések stílusa (indexek és görög betűk) */
+        .math-style { font-family: 'Lora', serif; font-style: italic; }
         .unit-select { font-size: 0.7rem; font-weight: 800; background: #334155; color: white; border-radius: 4px; padding: 2px 4px; margin-left: 4px; cursor: pointer; border: none; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     </style>
@@ -23,8 +25,8 @@
 
     <div class="grid lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
-            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl">
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-3">Szelvény típusa</label>
+            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl border border-slate-700">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-3 tracking-widest">Szelvény típusa</label>
                 <select id="type" onchange="updateUI()" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-indigo-400 outline-none">
                     <option value="kor">Kör szelvény</option>
                     <option value="gyuru">Körgyűrű szelvény</option>
@@ -34,36 +36,36 @@
                 </select>
             </div>
 
-            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
-                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Paraméterek</h3>
+            <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4 border border-slate-700">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometriai adatok</h3>
                 
-                <div id="div-D" class="flex items-center justify-between"><label class="text-xs font-bold uppercase">D:</label>
+                <div id="div-D" class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">D:</label>
                     <div class="flex items-center"><input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()"><select id="D_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-d" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">d:</label>
+                <div id="div-d" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">d:</label>
                     <div class="flex items-center"><input type="number" id="d" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="d_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-a" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">b (hosszabb):</label>
+                <div id="div-a" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">b:</label>
                     <div class="flex items-center"><input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()"><select id="a_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">a (rövidebb):</label>
+                <div id="div-b" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">a:</label>
                     <div class="flex items-center"><input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()"><select id="b_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">t:</label>
+                <div id="div-t" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">t:</label>
                     <div class="flex items-center"><input type="number" id="t_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="3" oninput="calculate()"><select id="t_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="10">cm</option></select></div>
                 </div>
-                <div id="div-Am" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase">A<sub>m</sub>:</label>
+                <div id="div-Am" class="hidden flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">A<sub>m</sub>:</label>
                     <div class="flex items-center"><input type="number" id="Am_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="2400" oninput="calculate()"><select id="Am_unit" onchange="calculate()" class="unit-select"><option value="1">mm²</option><option value="100">cm²</option></select></div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-700 space-y-3">
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase">G (Nyíró modulus):</label>
-                        <div class="flex items-center"><input type="number" id="G_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80000" oninput="calculate()"><span class="text-[10px] ml-2 font-bold text-slate-500">MPa</span></div>
+                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase text-indigo-300 math-style">G:</label>
+                        <div class="flex items-center"><input type="number" id="G_val" class="w-24 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center text-indigo-400 font-bold" value="80000" oninput="calculate()"><span class="text-[9px] ml-1 font-bold text-slate-500">MPa</span></div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase">M<sub>t</sub>:</label>
+                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">M<sub>t</sub>:</label>
                         <div class="flex items-center"><input type="number" id="Mt" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="500" oninput="calculate()"><select id="Mt_unit" onchange="calculate()" class="unit-select"><option value="1000">Nm</option><option value="1000000">kNm</option></select></div>
                     </div>
-                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase">l (hossz):</label>
+                    <div class="flex items-center justify-between"><label class="text-xs font-bold uppercase math-style">l:</label>
                         <div class="flex items-center"><input type="number" id="L" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()"><select id="L_unit" onchange="calculate()" class="unit-select"><option value="1">mm</option><option value="1000">m</option></select></div>
                     </div>
                 </div>
@@ -78,7 +80,7 @@
                 </div>
                 <div class="space-y-4">
                     <div class="bg-indigo-600 p-6 rounded-3xl shadow-xl">
-                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (&tau;<sub>max</sub>)</span>
+                        <span class="text-[10px] font-black text-indigo-200 uppercase block mb-1">Max. csúsztatófeszültség (<span class="math-style">&tau;<sub>max</sub></span>)</span>
                         <div class="flex justify-between items-center">
                             <h2 id="outTau" class="text-4xl font-900 tracking-tighter text-white">0.00</h2>
                             <select id="tau_unit" onchange="calculate()" class="unit-select bg-indigo-800"><option value="1">MPa</option><option value="10">kN/cm²</option></select>
@@ -87,23 +89,30 @@
                     
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span id="labelInertia" class="text-[9px] font-black text-slate-500 uppercase">I<sub>p</sub></span>
-                            <select id="inertia_unit" onchange="calculate()" class="unit-select"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
+                            <span id="labelInertia" class="text-[9px] font-black text-slate-500 uppercase math-style">I<sub>p</sub></span>
+                            <select id="inertia_unit" onchange="calculate()" class="unit-select">
+                                <option value="1">mm⁴</option>
+                                <option value="10000">cm⁴</option>
+                                <option value="1000000000000">m⁴</option>
+                            </select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
                     </div>
 
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (&vartheta;)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Fajlagos elcsavarodás (<span class="math-style">&vartheta;</span>)</span>
                             <select id="theta_unit" onchange="calculate()" class="unit-select"><option value="rad">rad/m</option><option value="deg">fok/m</option></select>
                         </div>
                         <div id="outTheta" class="text-xl font-black text-indigo-400">0</div>
                     </div>
 
-                    <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500">
-                        <span class="text-[9px] font-black text-slate-500 uppercase block mb-1">Teljes szögelfordulás (&phi;)</span>
-                        <div id="outPhi" class="text-2xl font-black text-white">0.0000 &deg;</div>
+                    <div class="bg-slate-800 p-5 rounded-2xl border-l-8 border-indigo-500 shadow-xl">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Teljes szögelfordulás (<span class="math-style">&phi;</span>)</span>
+                            <select id="phi_unit_res" onchange="calculate()" class="unit-select"><option value="deg">&deg;</option><option value="rad">rad</option></select>
+                        </div>
+                        <div id="outPhi" class="text-2xl font-black text-white">0.0000</div>
                     </div>
                 </div>
             </div>
@@ -123,7 +132,8 @@ function updateUI() {
     if (type === 'nyitott') { document.getElementById('div-a').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
     if (type === 'zart') { document.getElementById('div-Am').style.display = 'flex'; document.getElementById('div-t').style.display = 'flex'; }
 
-    document.getElementById('labelInertia').innerHTML = (type === 'kor' || type === 'gyuru') ? "Poláris másodrendű nyomaték (I<sub>p</sub>)" : "Torziós másodrendű nyomaték (I<sub>t</sub>)";
+    const label = document.getElementById('labelInertia');
+    label.innerHTML = (type === 'kor' || type === 'gyuru') ? "I<sub>p</sub>" : "I<sub>t</sub>";
     calculate();
 }
 
@@ -131,7 +141,7 @@ function drawSchema(type) {
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, 400, 400);
-    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "bold 15px Inter";
+    ctx.strokeStyle = '#1e293b'; ctx.fillStyle = '#1e293b'; ctx.lineWidth = 2; ctx.font = "italic bold 16px Lora";
     const cx = 200; const cy = 200;
 
     if(type === 'kor' || type === 'gyuru') {
@@ -140,7 +150,7 @@ function drawSchema(type) {
         if(type === 'gyuru') { ctx.beginPath(); ctx.arc(cx, cy, 55, 0, Math.PI*2); ctx.stroke(); ctx.fillText("d", cx-5, cy-40); }
     } else if(type === 'teglalap') {
         ctx.strokeRect(cx-120, cy-60, 240, 120);
-        ctx.fillText("b (hosszabb)", cx-40, cy-75); ctx.fillText("a", cx+130, cy+5);
+        ctx.fillText("b", cx-10, cy-75); ctx.fillText("a", cx+130, cy+5);
     } else if(type === 'nyitott' || type === 'zart') {
         ctx.strokeRect(cx-80, cy-80, 160, 160);
         ctx.fillText("t", cx-105, cy+5);
@@ -186,25 +196,28 @@ function calculate() {
         }
 
         if (IpIt > 0) {
-            // Feszültség számítás és váltás
             const tauVal = (Mt / Wt) / parseFloat(document.getElementById('tau_unit').value);
             document.getElementById('outTau').innerText = tauVal.toFixed(2);
 
-            // Inercia váltás
-            const inerciaVal = IpIt / parseFloat(document.getElementById('inertia_unit').value);
-            document.getElementById('outIt').innerText = inerciaVal.toLocaleString('hu-HU', {maximumFractionDigits: 2});
+            const iUnit = parseFloat(document.getElementById('inertia_unit').value);
+            const inerciaVal = IpIt / iUnit;
+            // Ha méter a mértékegység, több tizedes kell
+            const decimals = iUnit > 1000000 ? 12 : 2;
+            document.getElementById('outIt').innerText = inerciaVal.toLocaleString('hu-HU', {maximumFractionDigits: decimals});
 
-            // Fajlagos elcsavarodás (rad/mm -> rad/m)
             const thetaRadM = (Mt / (G * IpIt)) * 1000;
             if(document.getElementById('theta_unit').value === 'rad') {
-                document.getElementById('outTheta').innerText = thetaRadM.toFixed(6) + " rad/m";
+                document.getElementById('outTheta').innerText = thetaRadM.toFixed(8) + " rad/m";
             } else {
-                document.getElementById('outTheta').innerText = (thetaRadM * 180 / Math.PI).toFixed(4) + " fok/m";
+                document.getElementById('outTheta').innerText = (thetaRadM * 180 / Math.PI).toFixed(6) + " fok/m";
             }
 
-            // Teljes elcsavarodás
-            const phiDeg = (thetaRadM * 180 / Math.PI) * (L / 1000);
-            document.getElementById('outPhi').innerHTML = phiDeg.toFixed(4) + " &deg;";
+            const phiRad = thetaRadM * (L / 1000);
+            if(document.getElementById('phi_unit_res').value === 'deg') {
+                document.getElementById('outPhi').innerHTML = (phiRad * 180 / Math.PI).toFixed(4) + " &deg;";
+            } else {
+                document.getElementById('outPhi').innerText = phiRad.toFixed(6) + " rad";
+            }
         }
     } catch(e) { console.error(e); }
     drawSchema(document.getElementById('type').value);
