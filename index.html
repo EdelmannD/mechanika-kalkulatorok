@@ -88,7 +88,7 @@
                     </div>
                     <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700">
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-[9px] font-black text-slate-500 uppercase">Másodrendű nyomaték (<span id="labelInertia" class="math-normal">I<sub>p</sub></span>)</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase">Torziós inercia (<span id="labelInertia" class="math-normal">I<sub>t</sub></span>)</span>
                             <select id="inertia_unit" onchange="calculate()" class="unit-select"><option value="1">mm⁴</option><option value="10000">cm⁴</option></select>
                         </div>
                         <div id="outIt" class="text-xl font-black text-white">0</div>
@@ -115,11 +115,11 @@
 
 <script>
 const SV_TABLE = [
-    {r: 1.0, a: 0.208, b: 0.141, g: 1.000}, {r: 1.5, a: 0.231, b: 0.196, g: 0.859},
-    {r: 2.0, a: 0.246, b: 0.229, g: 0.795}, {r: 3.0, a: 0.267, b: 0.263, g: 0.753},
-    {r: 4.0, a: 0.282, b: 0.281, g: 0.745}, {r: 6.0, a: 0.299, b: 0.299, g: 0.743},
-    {r: 8.0, a: 0.307, b: 0.307, g: 0.742}, {r: 10.0, a: 0.312, b: 0.312, g: 0.742},
-    {r: 100.0, a: 0.333, b: 0.333, g: 0.742}
+    {r: 1.0, a: 0.208, b: 0.141}, {r: 1.5, a: 0.231, b: 0.196},
+    {r: 2.0, a: 0.246, b: 0.229}, {r: 3.0, a: 0.267, b: 0.263},
+    {r: 4.0, a: 0.282, b: 0.281}, {r: 6.0, a: 0.299, b: 0.299},
+    {r: 8.0, a: 0.307, b: 0.307}, {r: 10.0, a: 0.312, b: 0.312},
+    {r: 100.0, a: 0.333, b: 0.333}
 ];
 
 function interpolate(ratio, key) {
@@ -165,7 +165,7 @@ function drawSchema(type) {
         ctx.lineWidth = 1; ctx.fillText("b", cx-40, cy+85); ctx.fillText("t", cx-100, cy);
     } else if(type === 'zart') {
         ctx.setLineDash([5, 5]); ctx.strokeRect(cx-75, cy-75, 150, 150); ctx.setLineDash([]);
-        ctx.fillText("A k", cx-12, cy+5); ctx.fillText("t", cx-95, cy-50);
+        ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-95, cy-50);
     }
 }
 
