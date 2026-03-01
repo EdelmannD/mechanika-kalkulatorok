@@ -66,8 +66,8 @@
                     </div>
                     <div class="grid grid-cols-12 gap-2 text-[9px] font-black text-slate-500 uppercase px-1 mb-1">
                         <div class="col-span-1">#</div>
-                        <div class="col-span-6 text-center">Tengelyhossz (L<sub>i</sub>) [mm]</div>
-                        <div class="col-span-5 text-center">Vastagság (v<sub>i</sub>) [mm]</div>
+                        <div class="col-span-6 text-center">Tengelyhossz (L<sub>i</sub>)</div>
+                        <div class="col-span-5 text-center">Vastagság (v<sub>i</sub>)</div>
                     </div>
                     <div id="dynamic-rows" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
                     <div class="flex justify-between items-center pt-3 border-t border-slate-700/50">
@@ -93,7 +93,7 @@
         <div class="lg:col-span-8 flex flex-col gap-6">
             <div id="warning-box" class="hidden bg-red-900/40 border border-red-500 p-3 rounded-xl flex items-center gap-3">
                 <span class="text-xl">⚠️</span>
-                <p class="text-[10px] font-black uppercase tracking-tight text-red-200">Geometriai korlát: a vékonyfalú feltétel (L<sub>i</sub>/v<sub>i</sub> ≥ 5) nem teljesül minden elemnél!</p>
+                <p class="text-[10px] font-black uppercase tracking-tight text-red-200">Vékonyfalú feltétel (L<sub>i</sub>/v<sub>i</sub> ≥ 5) sérült!</p>
             </div>
             
             <div class="grid md:grid-cols-2 gap-8">
@@ -161,8 +161,8 @@ function generateInputs() {
         container.innerHTML += `
             <div class="grid grid-cols-12 gap-2 items-center">
                 <span class="col-span-1 text-[10px] font-bold text-slate-500">${i}.</span>
-                <input type="number" id="Li_${i}" value="80" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
-                <input type="number" id="vi_${i}" value="4" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="Li_${i}" value="${i==1?80:40}" class="col-span-6 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
+                <input type="number" id="vi_${i}" value="${i==1?4:2}" class="col-span-5 p-1 bg-slate-900 border border-slate-700 rounded text-center text-xs text-white" oninput="calculate()">
             </div>`;
     }
     calculate();
@@ -246,6 +246,7 @@ function drawSchema(type) {
     ctx.clearRect(0, 0, 400, 400);
     const cx = 200, cy = 200;
     ctx.strokeStyle = '#334155'; ctx.fillStyle = '#334155'; ctx.lineWidth = 2.5; ctx.font = "italic 16px Libre Baskerville";
+    
     if(type === 'kor') {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
         ctx.fillText("D", cx-8, cy-95);
@@ -253,13 +254,21 @@ function drawSchema(type) {
         ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2); ctx.stroke();
         ctx.beginPath(); ctx.arc(cx, cy, 50, 0, Math.PI*2); ctx.stroke();
         ctx.fillText("D", cx-8, cy-95);
-        ctx.fillText("d", cx-8, cy-30);
+        ctx.fillText("d", cx-8, cy+15);
     } else if(type === 'teglalap') {
         ctx.strokeRect(cx-100, cy-50, 200, 100); ctx.fillText("b", cx-5, cy-65); ctx.fillText("a", cx+110, cy+5);
     } else if(type === 'nyitott') {
-        ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(cx-80, cy-60); ctx.lineTo(cx-80, cy+60); ctx.lineTo(cx+80, cy+60); ctx.stroke();
-        ctx.fillText("Li", cx, cy+85); 
-        ctx.fillText("vi", cx-115, cy-20);
+        // 1. szakasz (függőleges felső)
+        ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx-60, cy-100); ctx.lineTo(cx-60, cy); ctx.stroke();
+        // 2. szakasz (vízszintes közép)
+        ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(cx-60, cy); ctx.lineTo(cx+40, cy); ctx.stroke();
+        // 3. szakasz (függőleges alsó)
+        ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(cx+40, cy); ctx.lineTo(cx+40, cy+80); ctx.stroke();
+        
+        ctx.font = "italic 13px Libre Baskerville";
+        ctx.fillText("L1, v1", cx-105, cy-50);
+        ctx.fillText("L2, v2", cx-15, cy-10);
+        ctx.fillText("L3, v3", cx+50, cy+45);
     } else if(type === 'zart') {
         ctx.setLineDash([5, 5]); ctx.strokeRect(cx-70, cy-70, 140, 140); ctx.setLineDash([]);
         ctx.fillText("Ak", cx-12, cy+5); ctx.fillText("t", cx-90, cy-50);
