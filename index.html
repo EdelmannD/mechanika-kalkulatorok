@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Mechanika - Prizmatikus Rúd Kalkulátor</title>
     <style>
-
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f1f5f9; }
         canvas { background-color: #ffffff; border-radius: 1rem; border: 2px solid #334155; }
@@ -15,21 +14,14 @@
         .unit-select { font-size: 0.7rem; background: #1e293b; color: #818cf8; border: 1px solid #475569; border-radius: 4px; padding: 2px; cursor: pointer; outline: none; }
         .unit-select-out { font-size: 0.7rem; background: #334155; color: #cbd5e1; border-radius: 4px; padding: 2px; cursor: pointer; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
     </style>
-
 </head>
-
 <body class="min-h-screen p-4 md:p-8">
 <div class="max-w-7xl mx-auto">
-
     <header class="mb-8 border-b border-slate-700 pb-4">
         <h1 class="text-3xl font-900 tracking-tighter uppercase text-indigo-400">Mechanika Válogatott Fejezetei</h1>
         <p class="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Szabad Csavarás - Interaktív Kalkulátor</p>
-
     </header>
-
-
     <div class="grid lg:grid-cols-12 gap-8">
         <div class="lg:col-span-4 space-y-6">
             <div class="bg-slate-800 p-5 rounded-3xl shadow-xl border border-slate-700">
@@ -42,86 +34,65 @@
                     <option value="zart">Vékonyfalú zárt (Bredt)</option>
                 </select>
             </div>
-
             <div class="bg-slate-800 p-6 rounded-3xl shadow-xl space-y-4 border border-slate-700">
                 <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest border-b border-slate-700 pb-2">Geometria és Anyag</h3>
-
                 <div id="div-D" class="flex items-center justify-between"><label class="math">D:</label>
                     <div class="flex gap-2 items-center">
                         <input type="number" id="D" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="60" oninput="calculate()">
                         <select id="u-D" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
-
                     </div>
                 </div>
-
                 <div id="div-d" class="hidden flex items-center justify-between"><label class="math">d:</label>
                     <div class="flex gap-2 items-center">
                         <input type="number" id="d_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
                         <select id="u-d" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
                     </div>
-
                 </div>
                 <div id="div-a" class="hidden flex items-center justify-between"><label class="math">b:</label>
                     <div class="flex gap-2 items-center">
                         <input type="number" id="a_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="80" oninput="calculate()">
                         <select id="u-a" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
-
                     </div>
-
                 </div>
-
                 <div id="div-b" class="hidden flex items-center justify-between"><label class="math">a:</label>
                     <div class="flex gap-2 items-center">
                         <input type="number" id="b_val" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="40" oninput="calculate()">
                         <select id="u-b" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option></select>
-
                     </div>
                 </div>
-
                 <div id="div-open-spec" class="hidden space-y-3 pt-2 border-t border-slate-700">
                     <div class="flex justify-between items-center"><label class="text-[10px] font-black text-indigo-400">η₀:</label>
                         <input type="number" id="eta0" value="1.15" step="0.01" class="w-16 p-1 bg-slate-900 border border-indigo-500 rounded text-center text-xs font-bold" oninput="calculate()">
-
                     </div>
-
                     <input type="number" id="n_elem" value="3" min="1" max="10" class="w-full bg-slate-900 border border-indigo-500 rounded p-2 text-center text-xs" oninput="generateRows()">
                     <div id="dynamic-rows" class="space-y-2 max-h-40 overflow-y-auto"></div>
-
                 </div>
-
                 <div id="div-zart-spec" class="hidden space-y-3 pt-2 border-t border-slate-700">
                     <div class="flex justify-between items-center"><label class="text-[10px] font-black text-indigo-400">Aₖ:</label>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="Ak_in" value="4800" class="w-20 p-2 bg-slate-900 border border-indigo-500 rounded text-center" oninput="calculate()">
                             <select id="u-Ak" class="unit-select" onchange="calculate()"><option value="1">mm²</option><option value="100">cm²</option></select>
-
                         </div>
-
                     </div>
                     <input type="number" id="nz_elem" value="4" min="3" class="w-full bg-slate-900 border border-indigo-500 rounded p-2 text-center text-xs" oninput="generateZartRows()">
                     <div id="dynamic-zrows" class="space-y-2"></div>
                 </div>
-
                 <div class="pt-4 border-t border-slate-700 space-y-3">
                     <div class="flex items-center justify-between"><label class="math text-indigo-300">l:</label>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="L_rod" class="w-20 p-2 bg-slate-900 border border-slate-700 rounded-lg text-center" value="1000" oninput="calculate()">
                             <select id="u-Lrod" class="unit-select" onchange="calculate()"><option value="1">mm</option><option value="10">cm</option><option value="1000">m</option></select>
                         </div>
-
-                    </div>
-                 
+                    </div>             
                     <div class="flex items-center justify-between">
                         <select id="input-mode" class="unit-select text-indigo-300 font-bold" onchange="updateInputUnits()">
                             <option value="mt">Mₜ [nyomaték]</option>
                             <option value="tau">τₘₐₓ [feszültség]</option>
-
                         </select>
                         <div class="flex gap-2 items-center">
                             <input type="number" id="Mt_or_Tau" class="w-20 p-2 bg-slate-900 border border-indigo-500 rounded-lg text-center font-bold text-white" value="500" oninput="calculate()">
                             <select id="u-in-val" class="unit-select" onchange="calculate()">
                             </select>
-
                         </div>
                     </div>
                     <div class="flex items-center justify-between"><label class="math text-indigo-300">G:</label>
@@ -136,7 +107,6 @@
                 </div>
             </div>
         </div>
-
         <div class="lg:col-span-8 space-y-6">
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
@@ -192,9 +162,6 @@
 const SV_TAB = [{r:1,b:0.141,a:0.208},{r:1.5,b:0.196,a:0.231},{r:2,b:0.229,a:0.246},{r:3,b:0.263,a:0.267},{r:4,b:0.281,a:0.282},{r:10,b:0.313,a:0.313},{r:100,b:0.333,a:0.333}];
 function interp(r,k){if(r<=SV_TAB[0].r)return SV_TAB[0][k]; if(r>=100)return 0.333; for(let i=0;i<SV_TAB.length-1;i++){let p1=SV_TAB[i],p2=SV_TAB[i+1];if(r>=p1.r&&r<=p2.r)return p1[k]+(r-p1.r)/(p2.r-p1.r)*(p2[k]-p1[k])}}
 function getV(id,uid){return (parseFloat(document.getElementById(id).value)||0)*(parseFloat(document.getElementById(uid).value)||1)}
-
-
-
 function updateInputUnits() {
     const mode = document.getElementById('input-mode').value;
     const inUnit = document.getElementById('u-in-val');
