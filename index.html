@@ -28,7 +28,7 @@
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest">Szelvény Kiválasztása</label>
                 <select id="type" onchange="updateUI()" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl font-bold text-indigo-400 outline-none">
                     <option value="kor">Kör szelvény</option>
-                    <option value="gyuru (vastag)">Körgyűrű szelvény</option>
+                    <option value="gyuru">Körgyűrű szelvény (vastag)</option>
                     <option value="teglalap">Téglalap (Saint-Venant)</option>
                     <option value="nyitott">Vékonyfalú nyitott</option>
                     <option value="zart">Vékonyfalú zárt (Bredt)</option>
@@ -208,7 +208,7 @@ function updateUI() {
     const t = document.getElementById('type').value;
     ['div-D','div-d','div-a','div-b','div-open-spec','div-zart-spec'].forEach(id=>document.getElementById(id).classList.add('hidden'));
     if(t==='kor') document.getElementById('div-D').classList.remove('hidden');
-    if(t==='gyuru (vastag)'){ document.getElementById('div-D').classList.remove('hidden'); document.getElementById('div-d').classList.remove('hidden'); }
+    if(t==='gyuru'){ document.getElementById('div-D').classList.remove('hidden'); document.getElementById('div-d').classList.remove('hidden'); }
     if(t==='teglalap'){ document.getElementById('div-a').classList.remove('hidden'); document.getElementById('div-b').classList.remove('hidden'); }
     if(t==='nyitott'){ document.getElementById('div-open-spec').classList.remove('hidden'); if(!document.getElementById('dynamic-rows').innerHTML) generateRows(); }
     if(t==='zart'){ document.getElementById('div-zart-spec').classList.remove('hidden'); if(!document.getElementById('dynamic-zrows').innerHTML) generateZartRows(); }
@@ -223,7 +223,7 @@ function calculate() {
     let It = 0, Wt = 0, Mt = 0, Tau = 0;
 
     if(type==='kor'){ const D=getV('D','u-D'); It=(Math.PI*Math.pow(D,4))/32; Wt=It/(D/2); }
-    else if(type==='gyuru (vastag)'){ const D=getV('D','u-D'), d=getV('d_val','u-d'); It=(Math.PI*(Math.pow(D,4)-Math.pow(d,4)))/32; Wt=It/(D/2); }
+    else if(type==='gyuru'){ const D=getV('D','u-D'), d=getV('d_val','u-d'); It=(Math.PI*(Math.pow(D,4)-Math.pow(d,4)))/32; Wt=It/(D/2); }
     else if(type==='teglalap'){ const b_in=getV('a_val','u-a'), a_in=getV('b_val','u-b'), b=Math.max(a_in,b_in), a=Math.min(a_in,b_in), r=b/a; It=interp(r,'b')*b*Math.pow(a,3); Wt=interp(r,'a')*b*Math.pow(a,2); }
     else if(type==='nyitott'){
 
